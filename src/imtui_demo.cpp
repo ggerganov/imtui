@@ -225,7 +225,7 @@ void ImTui::ShowDemoWindow(bool* p_open)
 
     // We specify a default position/size in case there's no data in the .ini file. Typically this isn't required! We only do it to make the Demo applications a little more welcoming.
     ImGui::SetNextWindowPos(ImVec2(4, 2), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(70, 40), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(70, 24), ImGuiCond_FirstUseEver);
 
     // Main body of the Demo window starts here.
     if (!ImGui::Begin("Dear ImGui Demo", p_open, window_flags))

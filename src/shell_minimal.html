@@ -7,6 +7,9 @@
         <link rel="shortcut icon" href="favicon.ico">
 
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+
+        <link rel="stylesheet" href="example_emscripten.css">
+
         <style>
             body { margin: 0; background-color: black; }
             #screen {
@@ -15,6 +18,8 @@
                 letter-spacing: 0px;
                 font-size: 13px;
                 height: 100%;
+            }
+            .no-sel {
                 -moz-user-select: none;
                 -webkit-user-select: none;
                 -ms-user-select:none;
@@ -37,13 +42,10 @@
                 filter: invert(100%);
             }
         </style>
-        <script type="text/javascript" src="example_emscripten_colors.js"></script>
     </head>
     <body>
 
-        <div>
-        <pre id="screen" contenteditable="true" unselectable="on"></pre>
-        </div>
+        <pre id="screen" class="no-sel" contenteditable="true" unselectable="on"></pre>
 
         <div class="cell-about">
             <a class="nav-link" href="https://github.com/ggerganov/imtui"><span class="d-none d-sm-inline">View on GitHub </span>
@@ -60,20 +62,14 @@
             var charSizeY = 15.0;
 
             function onkeyup(event) {
-                console.log('key up' + event.keyCode);
-
                 Module._set_key_up(event.keyCode);
             }
 
             function onkeydown(event) {
-                console.log('key down' + event.keyCode);
-
                 Module._set_key_down(event.keyCode);
             }
 
             function onkeypress(event) {
-                console.log('key press' + event.keyCode);
-
                 Module._set_key_press(event.keyCode);
             }
 
@@ -83,6 +79,7 @@
 
                 Module._set_mouse_pos(mouse_x, mouse_y);
 
+                event.preventDefault();
             };
 
             function onpointerdown(event) {
@@ -210,7 +207,7 @@
 
             var bufferScreen = null;
 
-            var colors = JSON.parse(colorsJson);
+            var oldRow = {};
 
             function test() {
                 if (bufferScreen == null) {
@@ -219,12 +216,27 @@
                 Module._render_frame();
                 Module._get_screen(bufferScreen);
 
+                var screen = document.getElementById('screen');
+
+                var screenXNew = Math.floor(window.innerWidth/charSizeX - 2);
+                var screenYNew = Math.floor(window.innerHeight/charSizeY - 2);
+
+                if (screenXNew != screenX || screenYNew != screenY) {
+                    screenX = screenXNew;
+                    screenY = screenYNew;
+                    screen.innerHTML = '';
+                    for (var i = 0; i < screenY; ++i) {
+                        screen.innerHTML += '<span id="r'+i+'" class="row no-sel"></span>';
+                    }
+                    Module._set_screen_size(screenX, screenY);
+                }
+
                 var idx = 0;
-                var result = "";
-                var prevf = -1;
-                var prevb = -1;
-                result += "<span style='color:#fff; background-color:#000'>";
                 for (var y = 0; y < screenY; ++y) {
+                    var curRow = '';
+                    var prevf = -1;
+                    var prevb = -1;
+                    curRow += '<span class="f0 b0">';
                     for (var x = 0; x < screenX; ++x) {
                         var c = (Module.HEAPU8)[bufferScreen + idx]; ++idx;
                         var f = (Module.HEAPU8)[bufferScreen + idx]; ++idx;
@@ -236,33 +248,24 @@
                         }
 
                         if (prevf != f || prevb != b) {
-                            result += "</span><span style='pointer-events: none; color:" + colors[f].hexString + "; background-color:" + colors[b].hexString + "'>";
+                            curRow += '</span><span class="f'+f+' b'+b+'">';
                         }
 
-                        result += c;
+                        curRow += c;
 
                         prevf = f;
                         prevb = b;
                     }
-                    result += '\n';
-                }
+                    curRow +='</span>\n';
 
-                var screen = document.getElementById('screen');
-
-                screen.innerHTML = result;
-
-                var screenXNew = Math.floor(window.innerWidth/charSizeX - 2);
-                var screenYNew = Math.floor(window.innerHeight/charSizeY - 2);
-
-                if (screenXNew != screenX || screenYNew != screenY) {
-                    screenX = screenXNew;
-                    screenY = screenYNew;
-                    Module._set_screen_size(screenX, screenY);
+                    if (curRow != oldRow[y]) {
+                        oldRow[y] = curRow;
+                        document.getElementById('r'+y).innerHTML = curRow;
+                    }
                 }
 
                 window.requestAnimationFrame(test);
             }
-
 
         </script>
         {{{ SCRIPT }}}

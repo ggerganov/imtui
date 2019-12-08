@@ -140,7 +140,7 @@ void render_frame() {
 
     ImGui::NewFrame();
 
-    ImGui::SetNextWindowPos(ImVec2(8, 50), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(8, 28), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(50.0, 10.0), ImGuiCond_Once);
     ImGui::Begin("Hello, world!");
     ImGui::Text("nframes = %d", nframes++);
