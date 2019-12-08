@@ -18,8 +18,8 @@ This library is 99.9% based on the popular [Dear ImGui](https://github.com/ocorn
 
 For basic usage of ImTui, check one of the available samples:
 
-- [example_ncurses0](https://github.com/ggerganov/imtui-wip/blob/master/src/example_ncurses0.cpp)
-- [example_ncurses1](https://github.com/ggerganov/imtui-wip/blob/master/src/example_ncurses1.cpp)
+- [example_ncurses0](https://github.com/ggerganov/imtui/blob/master/src/example_ncurses0.cpp)
+- [example_ncurses1](https://github.com/ggerganov/imtui/blob/master/src/example_ncurses1.cpp)
 
 *Note: the current implementation is experimental, so don't expect all things to work.*
 
