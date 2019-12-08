@@ -1,12 +1,16 @@
 # imtui
 
-ImTui is an immediate mode text-based user interface library. 
+ImTui is an immediate mode text-based user interface library. Supports 256 ANSI colors and mouse input via `libncurses`.
 
 [![imtui-sample](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU.svg)](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU)
 
 <a href="https://i.imgur.com/4370FJt.png" target="_blank">![imtui-screenshot](https://i.imgur.com/4370FJt.png)</a>
 
-Live demo in the browser: [imtui.ggerganov.com](https://imtui.ggerganov.com/)
+## Live demo in the browser
+
+Eventhough this library is supposed to be used in the terminal, for convenience here is an [Emscripten](https://emscripten.org) build to demonstrate what it would like, by simulating a console in the browser:
+
+Demo: [imtui.ggerganov.com](https://imtui.ggerganov.com/)
 
 ## Details
 
