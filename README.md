@@ -16,12 +16,12 @@ Demo: [imtui.ggerganov.com](https://imtui.ggerganov.com/)
 
 This library is 99.9% based on the popular [Dear ImGui](https://github.com/ocornut/imgui) library. ImTui simply provides an [ncurses](https://en.wikipedia.org/wiki/Ncurses) interface in order to draw and interact with widgets in the terminal. The entire Dear ImGui interface is available out-of-the-box.
 
-For a basic usage of ImTui, check one of the available samples:
+For basic usage of ImTui, check one of the available samples:
 
 - [example_ncurses0](https://github.com/ggerganov/imtui-wip/blob/master/src/example_ncurses0.cpp)
 - [example_ncurses1](https://github.com/ggerganov/imtui-wip/blob/master/src/example_ncurses1.cpp)
 
-The current implementation is experimental, so don't expect all things to work.
+*Note: the current implementation is experimental, so don't expect all things to work.*
 
 ## Building
 
