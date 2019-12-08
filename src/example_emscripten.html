@@ -22,6 +22,7 @@
             .no-sel {
                 -moz-user-select: none;
                 -webkit-user-select: none;
+                -webkit-touch-callout: none;
                 -ms-user-select:none;
                 user-select:none;
                 -o-user-select:none;
@@ -45,7 +46,9 @@
     </head>
     <body>
 
+        <div>
         <pre id="screen" class="no-sel" contenteditable="true" unselectable="on"></pre>
+        </div>
 
         <div class="cell-about">
             <a class="nav-link" href="https://github.com/ggerganov/imtui"><span class="d-none d-sm-inline">View on GitHub </span>
@@ -74,8 +77,8 @@
             }
 
             function onpointermove(event) {
-                var mouse_x = event.offsetX/charSizeX;
-                var mouse_y = event.offsetY/charSizeY;
+                var mouse_x = event.clientX/charSizeX;
+                var mouse_y = event.clientY/charSizeY;
 
                 Module._set_mouse_pos(mouse_x, mouse_y);
 
@@ -83,15 +86,15 @@
             };
 
             function onpointerdown(event) {
-                var mouse_x = event.offsetX/charSizeX;
-                var mouse_y = event.offsetY/charSizeY;
+                var mouse_x = event.clientX/charSizeX;
+                var mouse_y = event.clientY/charSizeY;
 
                 Module._set_mouse_down(event.button, mouse_x, mouse_y);
             }
 
             function onpointerup(event) {
-                var mouse_x = event.offsetX/charSizeX;
-                var mouse_y = event.offsetY/charSizeY;
+                var mouse_x = event.clientX/charSizeX;
+                var mouse_y = event.clientY/charSizeY;
 
                 Module._set_mouse_up(event.button, mouse_x, mouse_y);
 
@@ -226,7 +229,7 @@
                     screenY = screenYNew;
                     screen.innerHTML = '';
                     for (var i = 0; i < screenY; ++i) {
-                        screen.innerHTML += '<span id="r'+i+'" class="row no-sel"></span>';
+                        screen.innerHTML += '<span id="r'+i+'"></span>';
                     }
                     Module._set_screen_size(screenX, screenY);
                 }
