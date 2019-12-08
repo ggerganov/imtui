@@ -27,6 +27,9 @@
                 user-select:none;
                 -o-user-select:none;
             }
+            .cell {
+                pointer-events: none;
+            }
             .cell-about {
                 padding-right: 8px;
                 padding-top: 0.5em;
@@ -239,7 +242,7 @@
                     var curRow = '';
                     var prevf = -1;
                     var prevb = -1;
-                    curRow += '<span class="f0 b0">';
+                    curRow += '<span class="cell f0 b0">';
                     for (var x = 0; x < screenX; ++x) {
                         var c = (Module.HEAPU8)[bufferScreen + idx]; ++idx;
                         var f = (Module.HEAPU8)[bufferScreen + idx]; ++idx;
@@ -251,7 +254,7 @@
                         }
 
                         if (prevf != f || prevb != b) {
-                            curRow += '</span><span class="f'+f+' b'+b+'">';
+                            curRow += '</span><span class="cell f'+f+' b'+b+'">';
                         }
 
                         curRow += c;
