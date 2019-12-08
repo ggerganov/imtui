@@ -11,13 +11,17 @@
         <link rel="stylesheet" href="example_emscripten.css">
 
         <style>
-            body { margin: 0; background-color: black; }
+            body {
+                margin: 0; background-color: black;
+                -webkit-font-smoothing: subpixel-antialiased;
+                font-smoothing: subpixel-antialiased;
+            }
             #screen {
                 margin: 0;
                 padding: 0;
-                letter-spacing: 0px;
                 font-size: 13px;
                 height: 100%;
+                font: sans-serif;
             }
             .no-sel {
                 -moz-user-select: none;
@@ -64,8 +68,10 @@
             var screenX = 200;
             var screenY = 60;
 
-            var charSizeX = 7.8;
-            var charSizeY = 15.0;
+            var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
+            var charSizeX = isFirefox ? 8.0 : 7.8;
+            var charSizeY = isFirefox ? 17.0 : 15.0;
 
             function onkeyup(event) {
                 Module._set_key_up(event.keyCode);
