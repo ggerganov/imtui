@@ -1,6 +1,6 @@
 # imtui
 
-ImTui is an immediate mode text-based user interface library. Supports 256 ANSI colors and mouse input via `libncurses`.
+ImTui is an immediate mode text-based user interface library. Support 256 ANSI colors and mouse/keyboard input. 
 
 [![imtui-sample](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU.svg)](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU)
 
