@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <title>ImTui Emscripten example</title>
+
+        <link rel="shortcut icon" href="favicon.ico">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+        <style>
+            body { margin: 0; background-color: black; }
+            #screen {
+                margin: 0;
+                padding: 0;
+                letter-spacing: 0px;
+                font-size: 13px;
+                height: 100%;
+                -moz-user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select:none;
+                user-select:none;
+                -o-user-select:none;
+            }
+            .cell-about {
+                padding-right: 8px;
+                padding-top: 0.5em;
+                text-align: right;
+                display: inline-block;
+                float:right;
+            }
+            .nav-link {
+                text-decoration: none;
+                color: rgba(255, 255, 255, 0.5);
+            }
+            svg {
+                -webkit-filter: invert(100%); /* safari 6.0 - 9.0 */
+                filter: invert(100%);
+            }
+        </style>
+        <script type="text/javascript" src="example_emscripten_colors.js"></script>
+    </head>
+    <body>
+
+        <div>
+        <pre id="screen" contenteditable="true" unselectable="on"></pre>
+        </div>
+
+        <div class="cell-about">
+            <a class="nav-link" href="https://github.com/ggerganov/imtui"><span class="d-none d-sm-inline">View on GitHub </span>
+                <svg version="1.1" width="16" height="16" viewBox="0 0 16 16" class="octicon octicon-mark-github" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
+            </a>
+        </div>
+
+        <script type='text/javascript'>
+
+            var screenX = 200;
+            var screenY = 60;
+
+            var charSizeX = 7.8;
+            var charSizeY = 15.0;
+
+            function onkeyup(event) {
+                console.log('key up' + event.keyCode);
+
+                Module._set_key_up(event.keyCode);
+            }
+
+            function onkeydown(event) {
+                console.log('key down' + event.keyCode);
+
+                Module._set_key_down(event.keyCode);
+            }
+
+            function onkeypress(event) {
+                console.log('key press' + event.keyCode);
+
+                Module._set_key_press(event.keyCode);
+            }
+
+            function onpointermove(event) {
+                var mouse_x = event.offsetX/charSizeX;
+                var mouse_y = event.offsetY/charSizeY;
+
+                Module._set_mouse_pos(mouse_x, mouse_y);
+
+            };
+
+            function onpointerdown(event) {
+                var mouse_x = event.offsetX/charSizeX;
+                var mouse_y = event.offsetY/charSizeY;
+
+                Module._set_mouse_down(event.button, mouse_x, mouse_y);
+            }
+
+            function onpointerup(event) {
+                var mouse_x = event.offsetX/charSizeX;
+                var mouse_y = event.offsetY/charSizeY;
+
+                Module._set_mouse_up(event.button, mouse_x, mouse_y);
+
+                event.preventDefault();
+            }
+
+            function onwheel(event) {
+                let scale = 1.0;
+                switch (event.deltaMode) {
+                    case event.DOM_DELTA_PIXEL:
+                        scale = 0.01;
+                        break;
+                    case event.DOM_DELTA_LINE:
+                        scale = 0.2;
+                        break;
+                    case event.DOM_DELTA_PAGE:
+                        scale = 1.0;
+                        break;
+                }
+
+                var wheel_x =  event.deltaX * scale;
+                var wheel_y = -event.deltaY * scale;
+
+                Module._set_mouse_wheel(wheel_x, wheel_y);
+
+                //if (this.io.want_capture_mouse) {
+                //    event.preventDefault();
+                //}
+            }
+
+            function ontouch(event) {
+                if (event.touches.length > 1) {
+                    return;
+                }
+
+                var touches = event.changedTouches,
+                    first = touches[0],
+                    type = "";
+
+                switch(event.type) {
+                    case "touchstart": type = "mousedown"; break;
+                    case "touchmove":  type = "mousemove"; break;
+                    case "touchend":   type = "mouseup";   break;
+                    default:           type = "mousemove";
+                }
+
+                // initMouseEvent(type, canBubble, cancelable, view, clickCount,
+                //                screenX, screenY, clientX, clientY, ctrlKey,
+                //                altKey, shiftKey, metaKey, button, relatedTarget);
+
+                var simulatedEvent = document.createEvent("MouseEvent");
+                simulatedEvent.initMouseEvent(type, true, true, window, 1, first.screenX, first.screenY, first.clientX, first.clientY, false, false, false, false, 0/*left*/, null);
+
+                first.target.dispatchEvent(simulatedEvent);
+                event.preventDefault();
+            }
+
+            function init() {
+                var screen = document.getElementById('screen');
+
+                screen.addEventListener('keyup', onkeyup, true);
+                screen.addEventListener('keydown', onkeydown, true);
+                screen.addEventListener('keypress', onkeypress, true);
+
+                screen.addEventListener('pointermove', onpointermove);
+                screen.addEventListener('mousemove', onpointermove);
+
+                screen.addEventListener('pointerdown', onpointerdown);
+                screen.addEventListener('mousedown', onpointerdown);
+
+                screen.addEventListener('pointerup', onpointerup);
+                screen.addEventListener('mouseup', onpointerup);
+
+                screen.addEventListener('contextmenu', function(event) { event.preventDefault(); });
+                screen.addEventListener('wheel', onwheel, false);
+
+                screen.addEventListener('touchstart', ontouch);
+                screen.addEventListener('touchmove', ontouch);
+                screen.addEventListener('touchend', ontouch);
+                screen.addEventListener('touchcancel', ontouch);
+
+                Module._set_screen_size(screenX, screenY);
+
+                window.requestAnimationFrame(test);
+            }
+
+            var Module = {
+                preRun: [],
+                postRun: [(function () {
+                    init();
+                })
+                ],
+                print: (function() {
+                    return function(text) {
+                        text = Array.prototype.slice.call(arguments).join(' ');
+                        console.log(text);
+                    };
+                })(),
+                printErr: function(text) {
+                    text = Array.prototype.slice.call(arguments).join(' ');
+                    console.error(text);
+                },
+                setStatus: function(text) {
+                    console.log("status: " + text);
+                },
+                monitorRunDependencies: function(left) {
+                    // no run dependencies to log
+                }
+            };
+            window.onerror = function() {
+                console.log("onerror: " + event);
+            };
+
+            var bufferScreen = null;
+
+            var colors = JSON.parse(colorsJson);
+
+            function test() {
+                if (bufferScreen == null) {
+                    bufferScreen = Module._malloc(3*512*128);
+                }
+                Module._render_frame();
+                Module._get_screen(bufferScreen);
+
+                var idx = 0;
+                var result = "";
+                var prevf = -1;
+                var prevb = -1;
+                result += "<span style='color:#fff; background-color:#000'>";
+                for (var y = 0; y < screenY; ++y) {
+                    for (var x = 0; x < screenX; ++x) {
+                        var c = (Module.HEAPU8)[bufferScreen + idx]; ++idx;
+                        var f = (Module.HEAPU8)[bufferScreen + idx]; ++idx;
+                        var b = (Module.HEAPU8)[bufferScreen + idx]; ++idx;
+                        if (c > 10 && c < 128) {
+                            c = String.fromCharCode(c);
+                        } else {
+                            c = ' ';
+                        }
+
+                        if (prevf != f || prevb != b) {
+                            result += "</span><span style='pointer-events: none; color:" + colors[f].hexString + "; background-color:" + colors[b].hexString + "'>";
+                        }
+
+                        result += c;
+
+                        prevf = f;
+                        prevb = b;
+                    }
+                    result += '\n';
+                }
+
+                var screen = document.getElementById('screen');
+
+                screen.innerHTML = result;
+
+                var screenXNew = Math.floor(window.innerWidth/charSizeX - 2);
+                var screenYNew = Math.floor(window.innerHeight/charSizeY - 2);
+
+                if (screenXNew != screenX || screenYNew != screenY) {
+                    screenX = screenXNew;
+                    screenY = screenYNew;
+                    Module._set_screen_size(screenX, screenY);
+                }
+
+                window.requestAnimationFrame(test);
+            }
+
+
+        </script>
+        <script async type="text/javascript" src="example_emscripten.js"></script>
+    </body>
+</html>
+
+

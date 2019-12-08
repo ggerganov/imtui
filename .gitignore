@@ -1,0 +1,7 @@
+compile_commands.json
+build
+build-*
+
+.vscode
+.cquery_cache
+*.code-workspace
