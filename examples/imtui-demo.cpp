@@ -228,7 +228,7 @@ void ImTui::ShowDemoWindow(bool* p_open)
     ImGui::SetNextWindowSize(ImVec2(70, 24), ImGuiCond_FirstUseEver);
 
     // Main body of the Demo window starts here.
-    if (!ImGui::Begin("ImTui Demo /  (powered by Dear ImGui)", p_open, window_flags))
+    if (!ImGui::Begin("ImTui Demo / (powered by Dear ImGui)", p_open, window_flags))
     {
         // Early out if the window is collapsed, as an optimization.
         ImGui::End();

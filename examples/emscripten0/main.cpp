@@ -17,8 +17,6 @@
 // For clarity, our main loop code is declared at the end.
 void main_loop(void*);
 
-int nframes = 0;
-
 bool show_demo_window = true;
 
 ImTui::TScreen screen;
@@ -143,7 +141,6 @@ void render_frame() {
     ImGui::SetNextWindowPos(ImVec2(8, 28), ImGuiCond_Once);
     ImGui::SetNextWindowSize(ImVec2(50.0, 10.0), ImGuiCond_Once);
     ImGui::Begin("Hello, world!");
-    ImGui::Text("nframes = %d", nframes++);
     ImGui::Text("mx = %g, my = %g", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
