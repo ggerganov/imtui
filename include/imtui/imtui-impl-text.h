@@ -8,8 +8,7 @@ namespace ImTui {
 struct TScreen;
 }
 
-// Backend API
-IMGUI_IMPL_API bool     ImTui_ImplText_Init();
-IMGUI_IMPL_API void     ImTui_ImplText_Shutdown();
-IMGUI_IMPL_API void     ImTui_ImplText_NewFrame();
-IMGUI_IMPL_API void     ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & screen);
+bool ImTui_ImplText_Init();
+void ImTui_ImplText_Shutdown();
+void ImTui_ImplText_NewFrame();
+void ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & screen);

@@ -40,3 +40,15 @@ if (IMTUI_SUPPORT_NCURSES)
         ${CURSES_LIBRARIES}
         )
 endif()
+
+# emscripten
+
+if (EMSCRIPTEN)
+    add_library(imtui-emscripten ${IMTUI_LIBRARY_TYPE}
+        imtui-impl-emscripten.cpp
+        )
+
+    target_link_libraries(imtui-emscripten PUBLIC
+        imtui-core
+        )
+endif()
