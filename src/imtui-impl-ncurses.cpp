@@ -10,8 +10,7 @@
 
 #include <map>
 
-bool     ImTui_ImplNcurses_Init()
-{
+bool ImTui_ImplNcurses_Init() {
     initscr();
     use_default_colors();
     start_color();
@@ -25,6 +24,29 @@ bool     ImTui_ImplNcurses_Init()
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
     printf("\033[?1003h\n"); // Makes the terminal report mouse movement events
 
+    ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
+    ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]   = 260;
+    ImGui::GetIO().KeyMap[ImGuiKey_RightArrow]  = 261;
+    ImGui::GetIO().KeyMap[ImGuiKey_UpArrow]     = 259;
+    ImGui::GetIO().KeyMap[ImGuiKey_DownArrow]   = 258;
+    ImGui::GetIO().KeyMap[ImGuiKey_PageUp]      = 339;
+    ImGui::GetIO().KeyMap[ImGuiKey_PageDown]    = 338;
+    ImGui::GetIO().KeyMap[ImGuiKey_Home]        = 262;
+    ImGui::GetIO().KeyMap[ImGuiKey_End]         = 360;
+    ImGui::GetIO().KeyMap[ImGuiKey_Insert]      = 331;
+    ImGui::GetIO().KeyMap[ImGuiKey_Delete]      = 330;
+    ImGui::GetIO().KeyMap[ImGuiKey_Backspace]   = 263;
+    ImGui::GetIO().KeyMap[ImGuiKey_Space]       = 32;
+    ImGui::GetIO().KeyMap[ImGuiKey_Enter]       = 10;
+    ImGui::GetIO().KeyMap[ImGuiKey_Escape]      = 27;
+    ImGui::GetIO().KeyMap[ImGuiKey_KeyPadEnter] = 343;
+    ImGui::GetIO().KeyMap[ImGuiKey_A]           = 1;
+    ImGui::GetIO().KeyMap[ImGuiKey_C]           = 3;
+    ImGui::GetIO().KeyMap[ImGuiKey_V]           = 22;
+    ImGui::GetIO().KeyMap[ImGuiKey_X]           = 24;
+    ImGui::GetIO().KeyMap[ImGuiKey_Y]           = 25;
+    ImGui::GetIO().KeyMap[ImGuiKey_Z]           = 26;
+
 	int screenSizeX = 0;
 	int screenSizeY = 0;
 
@@ -34,12 +56,10 @@ bool     ImTui_ImplNcurses_Init()
     return true;
 }
 
-void     ImTui_ImplNcurses_Shutdown()
-{
+void ImTui_ImplNcurses_Shutdown() {
 }
 
-void     ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen)
-{
+void ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen) {
 	int screenSizeX = 0;
 	int screenSizeY = 0;
 
@@ -110,8 +130,7 @@ void     ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen)
     ImGui::GetIO().MouseDown[0] = lbut;
 }
 
-void     ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen)
-{
+void ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen) {
     int np = 1;
     std::map<int, int> pairs;
 
@@ -136,7 +155,6 @@ void     ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen)
     }
 }
 
-bool     ImTui_ImplNcurses_ProcessEvent()
-{
+bool ImTui_ImplNcurses_ProcessEvent() {
     return true;
 }

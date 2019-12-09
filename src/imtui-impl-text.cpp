@@ -235,8 +235,7 @@ void ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & scree
 
 }
 
-bool    ImTui_ImplText_Init()
-{
+bool ImTui_ImplText_Init() {
     ImGui::GetStyle().Alpha                   = 1.0f;
     ImGui::GetStyle().WindowPadding           = ImVec2(0.5,0.0);
     ImGui::GetStyle().WindowRounding          = 0.0f;
@@ -277,29 +276,6 @@ bool    ImTui_ImplText_Init()
     ImGui::GetStyle().Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15, 0.15, 0.15, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_TextSelectedBg]   = ImVec4(0.75, 0.75, 0.75, 0.5f);
 
-    ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
-    ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]   = 260;
-    ImGui::GetIO().KeyMap[ImGuiKey_RightArrow]  = 261;
-    ImGui::GetIO().KeyMap[ImGuiKey_UpArrow]     = 259;
-    ImGui::GetIO().KeyMap[ImGuiKey_DownArrow]   = 258;
-    ImGui::GetIO().KeyMap[ImGuiKey_PageUp]      = 339;
-    ImGui::GetIO().KeyMap[ImGuiKey_PageDown]    = 338;
-    ImGui::GetIO().KeyMap[ImGuiKey_Home]        = 262;
-    ImGui::GetIO().KeyMap[ImGuiKey_End]         = 360;
-    ImGui::GetIO().KeyMap[ImGuiKey_Insert]      = 331;
-    ImGui::GetIO().KeyMap[ImGuiKey_Delete]      = 330;
-    ImGui::GetIO().KeyMap[ImGuiKey_Backspace]   = 263;
-    ImGui::GetIO().KeyMap[ImGuiKey_Space]       = 32;
-    ImGui::GetIO().KeyMap[ImGuiKey_Enter]       = 10;
-    ImGui::GetIO().KeyMap[ImGuiKey_Escape]      = 27;
-    ImGui::GetIO().KeyMap[ImGuiKey_KeyPadEnter] = 343;
-    ImGui::GetIO().KeyMap[ImGuiKey_A]           = 1;
-    ImGui::GetIO().KeyMap[ImGuiKey_C]           = 3;
-    ImGui::GetIO().KeyMap[ImGuiKey_V]           = 22;
-    ImGui::GetIO().KeyMap[ImGuiKey_X]           = 24;
-    ImGui::GetIO().KeyMap[ImGuiKey_Y]           = 25;
-    ImGui::GetIO().KeyMap[ImGuiKey_Z]           = 26;
-
     ImFontConfig fontConfig;
     fontConfig.GlyphMinAdvanceX = 1.0f;
     fontConfig.SizePixels = 1.00;
@@ -313,10 +289,8 @@ bool    ImTui_ImplText_Init()
     return true;
 }
 
-void    ImTui_ImplText_Shutdown()
-{
+void ImTui_ImplText_Shutdown() {
 }
 
-void    ImTui_ImplText_NewFrame()
-{
+void ImTui_ImplText_NewFrame() {
 }

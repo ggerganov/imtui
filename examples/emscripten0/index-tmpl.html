@@ -12,7 +12,7 @@
     <body>
 
         <div>
-        <pre id="screen" class="no-sel" unselectable="on"></pre>
+        <pre id="screen" class="no-sel" contenteditable="true" unselectable="on"></pre>
         </div>
 
         <div class="cell-about">
@@ -33,14 +33,17 @@
 
             function onkeyup(event) {
                 Module._set_key_up(event.keyCode);
+                event.preventDefault();
             }
 
             function onkeydown(event) {
                 Module._set_key_down(event.keyCode);
+                event.preventDefault();
             }
 
             function onkeypress(event) {
                 Module._set_key_press(event.keyCode);
+                event.preventDefault();
             }
 
             function onpointermove(event) {

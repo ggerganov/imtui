@@ -60,15 +60,53 @@ void set_mouse_wheel(float x, float y) {
 
 EMSCRIPTEN_KEEPALIVE
 void set_key_down(int key) {
-    if (key > 0) {
-        lastKeysDown[key] = true;
+    lastAddText.resize(1);
+    if (lastKeysDown[17]) {
+        (key == 65) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_A]] = true);
+        (key == 67) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_C]] = true);
+        (key == 86) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_V]] = true);
+        (key == 88) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_X]] = true);
+        (key == 89) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Y]] = true);
+        (key == 90) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Z]] = true);
+    } else {
+        lastAddText[0] = key;
+    }
+
+    lastKeysDown[key] = true;
+
+    if (key == 16) {
+        ImGui::GetIO().KeyShift = true;
+    }
+
+    if (key == 17) {
+        ImGui::GetIO().KeyCtrl = true;
+    }
+
+    if (key == 18) {
+        ImGui::GetIO().KeyAlt = true;
     }
 }
 
 EMSCRIPTEN_KEEPALIVE
 void set_key_up(int key) {
-    if (key > 0) {
-        lastKeysDown[key] = false;
+    lastKeysDown[key] = false;
+
+    if (key == 16) {
+        ImGui::GetIO().KeyShift = false;
+    }
+
+    if (key == 17) {
+        ImGui::GetIO().KeyCtrl = false;
+        lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_A]] = false;
+        lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_C]] = false;
+        lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_V]] = false;
+        lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_X]] = false;
+        lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Y]] = false;
+        lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Z]] = false;
+    }
+
+    if (key == 18) {
+        ImGui::GetIO().KeyAlt = false;
     }
 }
 
@@ -156,6 +194,29 @@ void render_frame() {
 int main() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+
+    ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
+    ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]   = 37;
+    ImGui::GetIO().KeyMap[ImGuiKey_RightArrow]  = 39;
+    ImGui::GetIO().KeyMap[ImGuiKey_UpArrow]     = 38;
+    ImGui::GetIO().KeyMap[ImGuiKey_DownArrow]   = 40;
+    ImGui::GetIO().KeyMap[ImGuiKey_PageUp]      = 33;
+    ImGui::GetIO().KeyMap[ImGuiKey_PageDown]    = 34;
+    ImGui::GetIO().KeyMap[ImGuiKey_Home]        = 36;
+    ImGui::GetIO().KeyMap[ImGuiKey_End]         = 35;
+    ImGui::GetIO().KeyMap[ImGuiKey_Insert]      = 45;
+    ImGui::GetIO().KeyMap[ImGuiKey_Delete]      = 46;
+    ImGui::GetIO().KeyMap[ImGuiKey_Backspace]   = 8;
+    ImGui::GetIO().KeyMap[ImGuiKey_Space]       = 32;
+    ImGui::GetIO().KeyMap[ImGuiKey_Enter]       = 13;
+    ImGui::GetIO().KeyMap[ImGuiKey_Escape]      = 27;
+    ImGui::GetIO().KeyMap[ImGuiKey_KeyPadEnter] = 13;
+    ImGui::GetIO().KeyMap[ImGuiKey_A]           = 1;
+    ImGui::GetIO().KeyMap[ImGuiKey_C]           = 2;
+    ImGui::GetIO().KeyMap[ImGuiKey_V]           = 2;
+    ImGui::GetIO().KeyMap[ImGuiKey_X]           = 3;
+    ImGui::GetIO().KeyMap[ImGuiKey_Y]           = 4;
+    ImGui::GetIO().KeyMap[ImGuiKey_Z]           = 5;
 
     //emscripten_set_main_loop_arg(main_loop, NULL, 60, true);
 
