@@ -30,8 +30,6 @@ extern "C" {
         void set_screen_size(int nx, int ny) {
             ImGui::GetIO().DisplaySize.x = nx;
             ImGui::GetIO().DisplaySize.y = ny;
-
-            ImTui_ImplText_Init();
         }
 
     EMSCRIPTEN_KEEPALIVE
@@ -60,6 +58,7 @@ int main() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
+    ImTui_ImplText_Init();
     ImTui_ImplEmscripten_Init();
 
     return 0;
