@@ -197,6 +197,9 @@
                         screen.innerHTML += '<span id="r'+i+'"></span>';
                     }
                     Module._set_screen_size(screenX, screenY);
+
+                    window.requestAnimationFrame(test);
+                    return;
                 }
 
                 var idx = 0;
