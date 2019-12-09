@@ -272,8 +272,9 @@ bool    ImTui_ImplText_Init()
     ImGui::GetStyle().AntiAliasedFill         = false;
     ImGui::GetStyle().CurveTessellationTol    = 1.25f;
 
-    ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(0.15, 0.15, 0.15, 1.0f);
-    ImGui::GetStyle().Colors[ImGuiCol_TitleBg]  = ImVec4(0.35, 0.35, 0.35, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_WindowBg]         = ImVec4(0.15, 0.15, 0.15, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_TitleBg]          = ImVec4(0.35, 0.35, 0.35, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15, 0.15, 0.15, 1.0f);
 
     ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
     ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]   = 260;
