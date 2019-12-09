@@ -1,3 +1,42 @@
+body {
+    margin: 0; background-color: black;
+    -webkit-font-smoothing: subpixel-antialiased;
+    font-smoothing: subpixel-antialiased;
+}
+#screen {
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    height: 100%;
+    font: sans-serif;
+}
+.no-sel {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -ms-user-select:none;
+    user-select:none;
+    -o-user-select:none;
+}
+.cell {
+    pointer-events: none;
+}
+.cell-about {
+    padding-right: 8px;
+    padding-top: 0.5em;
+    text-align: right;
+    display: inline-block;
+    float:right;
+}
+.nav-link {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.5);
+}
+svg {
+    -webkit-filter: invert(100%); /* safari 6.0 - 9.0 */
+    filter: invert(100%);
+}
+
 .f0 {color:#000000}
 .f1 {color:#800000}
 .f2 {color:#008000}

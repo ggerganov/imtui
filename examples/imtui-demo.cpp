@@ -1,4 +1,4 @@
-/*! \file imtui_demo.cpp
+/*! \file imtui-demo.cpp
  *  \brief Enter description here.
  */
 
@@ -6,7 +6,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "imtui_demo.h"
+#include "imtui-demo.h"
 
 #include <ctype.h>          // toupper
 #include <limits.h>         // INT_MIN, INT_MAX

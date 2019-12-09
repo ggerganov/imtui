@@ -10,6 +10,14 @@ else()
     set(IMTUI_STANDALONE OFF)
 endif()
 
+if (EMSCRIPTEN)
+    set(IMTUI_EMSCRIPTEN ON)
+    set(IMTUI_LIBRARY_TYPE STATIC)
+else()
+    set(IMTUI_EMSCRIPTEN OFF)
+    set(IMTUI_LIBRARY_TYPE SHARED)
+endif()
+
 # options
 
 option(IMTUI_ALL_WARNINGS            "imtui: enable all compiler warnings" ${IMTUI_STANDALONE})
@@ -18,6 +26,10 @@ option(IMTUI_ALL_WARNINGS_3RD_PARTY  "imtui: enable all compiler warnings in 3rd
 option(IMTUI_SANITIZE_THREAD         "imtui: enable thread sanitizer" OFF)
 option(IMTUI_SANITIZE_ADDRESS        "imtui: enable address sanitizer" OFF)
 option(IMTUI_SANITIZE_UNDEFINED      "imtui: enable undefined sanitizer" OFF)
+
+option(IMTUI_SUPPORT_NCURSES         "imtui: support for ncurses" $<NOT:${IMTUI_EMSCRIPTEN}>)
+
+option(IMTUI_BUILD_EXAMPLES          "imtui: build examples" ${IMTUI_STANDALONE})
 
 # sanitizers
 
@@ -36,6 +48,12 @@ if (IMTUI_SANITIZE_UNDEFINED)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined")
 endif()
 
+# dependencies
+
+if (IMTUI_SUPPORT_NCURSES)
+    find_package(Curses REQUIRED)
+endif()
+
 # main
 
 find_package(Threads REQUIRED)
@@ -51,5 +69,6 @@ endif ()
 add_subdirectory(third-party)
 add_subdirectory(src)
 
-if (IMTUI_STANDALONE)
+if (IMTUI_STANDALONE AND IMTUI_BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif()

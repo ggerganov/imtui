@@ -1,4 +1,4 @@
-/*! \file imgui_impl_text.cpp
+/*! \file imtui-impl-text.cpp
  *  \brief Enter description here.
  */
 
@@ -6,8 +6,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "imgui/imgui.h"
-#include "imgui_impl_text.h"
+#include "imtui/imtui.h"
+#include "imtui/imtui-impl-text.h"
 
 #include <cmath>
 
@@ -70,7 +70,7 @@ void ScanLine(int x1, int y1, int x2, int y2, int ymax, std::vector<int> & xrang
     }
 }
 
-void drawTriangle(ImVec2 p0, ImVec2 p1, ImVec2 p2, unsigned char col, TScreen & screen) {
+void drawTriangle(ImVec2 p0, ImVec2 p1, ImVec2 p2, unsigned char col, ImTui::TScreen & screen) {
     int ymin = std::min(std::min(std::min((float) screen.data.size(), p0.y), p1.y), p2.y);
     int ymax = std::max(std::max(std::max(0.0f, p0.y), p1.y), p2.y);
 
@@ -103,13 +103,13 @@ void drawTriangle(ImVec2 p0, ImVec2 p1, ImVec2 p2, unsigned char col, TScreen & 
     }
 }
 
-TColor rgbToAnsi256(ImU32 col, bool doAlpha) {
-    TColor r = col & 0x000000FF;
-    TColor g = (col & 0x0000FF00) >> 8;
-    TColor b = (col & 0x00FF0000) >> 16;
+ImTui::TColor rgbToAnsi256(ImU32 col, bool doAlpha) {
+    ImTui::TColor r = col & 0x000000FF;
+    ImTui::TColor g = (col & 0x0000FF00) >> 8;
+    ImTui::TColor b = (col & 0x00FF0000) >> 16;
 
     if (doAlpha) {
-        TColor a = (col & 0xFF000000) >> 24;
+        ImTui::TColor a = (col & 0xFF000000) >> 24;
         float scale = float(a)/255;
         r = std::round(r*scale);
         g = std::round(g*scale);
@@ -128,7 +128,7 @@ TColor rgbToAnsi256(ImU32 col, bool doAlpha) {
         return std::round((float(r - 8) / 247) * 24) + 232;
     }
 
-    TColor res = 16
+    ImTui::TColor res = 16
         + (36 * std::round((float(r) / 255) * 5))
         + (6 * std::round((float(g) / 255) * 5))
         + std::round((float(b) / 255) * 5);
@@ -136,7 +136,7 @@ TColor rgbToAnsi256(ImU32 col, bool doAlpha) {
     return res;
 }
 
-void ImGui_ImplText_RenderDrawData(ImDrawData* draw_data, TScreen & screen) {
+void ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & screen) {
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
     int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
     int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
@@ -235,7 +235,7 @@ void ImGui_ImplText_RenderDrawData(ImDrawData* draw_data, TScreen & screen) {
 
 }
 
-bool    ImGui_ImplText_Init()
+bool    ImTui_ImplText_Init()
 {
     ImGui::GetStyle().Alpha                   = 1.0f;
     ImGui::GetStyle().WindowPadding           = ImVec2(0.5,0.0);
@@ -311,10 +311,10 @@ bool    ImGui_ImplText_Init()
     return true;
 }
 
-void    ImGui_ImplText_Shutdown()
+void    ImTui_ImplText_Shutdown()
 {
 }
 
-void    ImGui_ImplText_NewFrame()
+void    ImTui_ImplText_NewFrame()
 {
 }

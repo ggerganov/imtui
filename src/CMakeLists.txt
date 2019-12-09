@@ -6,38 +6,38 @@ if (IMTUI_ALL_WARNINGS)
     endif()
 endif()
 
-add_executable(test0 test0.cpp)
+# core
 
-target_link_libraries(test0 PRIVATE
+add_library(imtui-core ${IMTUI_LIBRARY_TYPE}
+    imtui-impl-text.cpp
+    )
+
+target_include_directories(imtui-core PUBLIC
+    ../include
+    )
+
+target_link_libraries(imtui-core PUBLIC
     imgui
-    curses
+    )
+
+target_link_libraries(imtui-core PRIVATE
     ${CMAKE_DL_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
     )
 
-add_executable(example_ncurses0
-    example_ncurses0.cpp
-    imtui_demo.cpp
-    imgui_impl_text.cpp
-    imgui_impl_ncurses.cpp
-    )
+# ncurses
 
-target_link_libraries(example_ncurses0 PRIVATE
-    imgui
-    curses
-    ${CMAKE_DL_LIBS}
-    ${CMAKE_THREAD_LIBS_INIT}
-    )
+if (IMTUI_SUPPORT_NCURSES)
+    add_library(imtui-ncurses ${IMTUI_LIBRARY_TYPE}
+        imtui-impl-ncurses.cpp
+        )
 
-add_executable(example_ncurses1
-    example_ncurses1.cpp
-    imgui_impl_text.cpp
-    imgui_impl_ncurses.cpp
-    )
+    target_include_directories(imtui-core PUBLIC
+        ${CURSES_INCLUDE_DIR}
+        )
 
-target_link_libraries(example_ncurses1 PRIVATE
-    imgui
-    curses
-    ${CMAKE_DL_LIBS}
-    ${CMAKE_THREAD_LIBS_INIT}
-    )
+    target_link_libraries(imtui-ncurses PUBLIC
+        imtui-core
+        ${CURSES_LIBRARIES}
+        )
+endif()

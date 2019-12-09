@@ -1,26 +1,25 @@
-#include "imgui/imgui.h"
+#include "imtui/imtui.h"
 
-#include "imgui_impl_text.h"
-#include "imgui_impl_ncurses.h"
+#include "imtui/imtui-impl-ncurses.h"
 
-#include "imtui_common.h"
+#include "imtui-common.h"
 
 int main() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
     VSync vsync;
-    TScreen screen;
+    ImTui::TScreen screen;
 
-    ImGui_ImplNcurses_Init();
-    ImGui_ImplText_Init();
+    ImTui_ImplNcurses_Init();
+    ImTui_ImplText_Init();
 
     int nframes = 0;
     float fval = 1.23f;
 
     while (true) {
-        ImGui_ImplNcurses_NewFrame(screen);
-        ImGui_ImplText_NewFrame();
+        ImTui_ImplNcurses_NewFrame(screen);
+        ImTui_ImplText_NewFrame();
 
         ImGui::GetIO().DeltaTime = vsync.delta_s();
 
@@ -40,14 +39,14 @@ int main() {
 
         ImGui::Render();
 
-        ImGui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
-        ImGui_ImplNcurses_DrawScreen(screen);
+        ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
+        ImTui_ImplNcurses_DrawScreen(screen);
 
         vsync.wait();
     }
 
-    ImGui_ImplText_Shutdown();
-    ImGui_ImplNcurses_Shutdown();
+    ImTui_ImplText_Shutdown();
+    ImTui_ImplNcurses_Shutdown();
 
     return 0;
 }

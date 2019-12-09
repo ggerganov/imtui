@@ -1,7 +1,7 @@
-#include "imgui/imgui.h"
+#include "imtui/imtui.h"
 
-#include "imgui_impl_text.h"
-#include "imtui_demo.h"
+#include "imtui-common.h"
+#include "imtui-demo.h"
 
 #include <emscripten.h>
 
@@ -21,7 +21,7 @@ int nframes = 0;
 
 bool show_demo_window = true;
 
-TScreen screen;
+ImTui::TScreen screen;
 
 // client input
 ImVec2 lastMousePos = { 0.0, 0.0 };
@@ -102,12 +102,12 @@ void set_screen_size(int nx, int ny) {
     ImGui::GetIO().DisplaySize.x = nx;
     ImGui::GetIO().DisplaySize.y = ny;
 
-    ImGui_ImplText_Init();
+    ImTui_ImplText_Init();
 }
 
 EMSCRIPTEN_KEEPALIVE
 void render_frame() {
-    ImGui_ImplText_NewFrame();
+    ImTui_ImplText_NewFrame();
 
     ImGui::GetIO().MousePos = lastMousePos;
     ImGui::GetIO().MouseWheelH = lastMouseWheelH;
@@ -152,7 +152,7 @@ void render_frame() {
 
     ImGui::Render();
 
-    ImGui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
+    ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
 }
 }
 

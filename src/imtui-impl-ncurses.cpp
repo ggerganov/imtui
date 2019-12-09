@@ -1,16 +1,16 @@
-/*! \file imgui_impl_ncurses.cpp
+/*! \file imtui-impl-ncurses.cpp
  *  \brief Enter description here.
  */
 
-#include "imgui/imgui.h"
-#include "imgui_impl_ncurses.h"
-#include "imgui_impl_text.h"
+#include "imtui/imtui.h"
+#include "imtui/imtui-impl-ncurses.h"
+#include "imtui/imtui-impl-text.h"
 
 #include <ncurses.h>
 
 #include <map>
 
-bool     ImGui_ImplNcurses_Init()
+bool     ImTui_ImplNcurses_Init()
 {
     initscr();
     use_default_colors();
@@ -34,11 +34,11 @@ bool     ImGui_ImplNcurses_Init()
     return true;
 }
 
-void     ImGui_ImplNcurses_Shutdown()
+void     ImTui_ImplNcurses_Shutdown()
 {
 }
 
-void     ImGui_ImplNcurses_NewFrame(TScreen & screen)
+void     ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen)
 {
 	int screenSizeX = 0;
 	int screenSizeY = 0;
@@ -110,7 +110,7 @@ void     ImGui_ImplNcurses_NewFrame(TScreen & screen)
     ImGui::GetIO().MouseDown[0] = lbut;
 }
 
-void     ImGui_ImplNcurses_DrawScreen(TScreen & screen)
+void     ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen)
 {
     int np = 1;
     std::map<int, int> pairs;
@@ -136,7 +136,7 @@ void     ImGui_ImplNcurses_DrawScreen(TScreen & screen)
     }
 }
 
-bool     ImGui_ImplNcurses_ProcessEvent()
+bool     ImTui_ImplNcurses_ProcessEvent()
 {
     return true;
 }

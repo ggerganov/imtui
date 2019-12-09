@@ -1,10 +1,10 @@
-/*! \file imtui_demo.h
+/*! \file imtui-demo.h
  *  \brief Enter description here.
  */
 
 #pragma once
 
-#include "imgui/imgui.h"
+#include "imtui/imtui.h"
 
 namespace ImTui {
 
