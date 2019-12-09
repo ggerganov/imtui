@@ -3,6 +3,7 @@
 #include "imtui/imtui-impl-ncurses.h"
 
 #include "imtui-common.h"
+#include "imtui-demo.h"
 
 int main() {
     IMGUI_CHECKVERSION();
@@ -14,6 +15,7 @@ int main() {
     ImTui_ImplNcurses_Init();
     ImTui_ImplText_Init();
 
+    bool demo = true;
     int nframes = 0;
     float fval = 1.23f;
 
@@ -34,8 +36,9 @@ int main() {
         ImGui::Text("Float:");
         ImGui::SameLine();
         ImGui::SliderFloat("##float", &fval, 0.0f, 10.0f);
-
         ImGui::End();
+
+        ImTui::ShowDemoWindow(&demo);
 
         ImGui::Render();
 

@@ -275,6 +275,7 @@ bool    ImTui_ImplText_Init()
     ImGui::GetStyle().Colors[ImGuiCol_WindowBg]         = ImVec4(0.15, 0.15, 0.15, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_TitleBg]          = ImVec4(0.35, 0.35, 0.35, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15, 0.15, 0.15, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_TextSelectedBg]   = ImVec4(0.75, 0.75, 0.75, 0.5f);
 
     ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
     ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]   = 260;
