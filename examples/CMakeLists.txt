@@ -1,9 +1,7 @@
+find_package(Threads REQUIRED)
+
 add_library(imtui-examples-common ${IMTUI_LIBRARY_TYPE}
     imtui-demo.cpp
-    )
-
-target_include_directories(imtui-examples-common PUBLIC
-    ../include
     )
 
 target_link_libraries(imtui-examples-common PRIVATE

@@ -22,7 +22,6 @@ target_link_libraries(imtui-core PUBLIC
 
 target_link_libraries(imtui-core PRIVATE
     ${CMAKE_DL_LIBS}
-    ${CMAKE_THREAD_LIBS_INIT}
     )
 
 # ncurses

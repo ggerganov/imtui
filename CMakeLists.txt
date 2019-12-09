@@ -11,10 +11,10 @@ else()
 endif()
 
 if (EMSCRIPTEN)
-    set(IMTUI_EMSCRIPTEN ON)
+    set(IMTUI_SUPPORT_NCURSES_DEFAULT OFF)
     set(IMTUI_LIBRARY_TYPE STATIC)
 else()
-    set(IMTUI_EMSCRIPTEN OFF)
+    set(IMTUI_SUPPORT_NCURSES_DEFAULT ON)
     set(IMTUI_LIBRARY_TYPE SHARED)
 endif()
 
@@ -27,7 +27,7 @@ option(IMTUI_SANITIZE_THREAD         "imtui: enable thread sanitizer" OFF)
 option(IMTUI_SANITIZE_ADDRESS        "imtui: enable address sanitizer" OFF)
 option(IMTUI_SANITIZE_UNDEFINED      "imtui: enable undefined sanitizer" OFF)
 
-option(IMTUI_SUPPORT_NCURSES         "imtui: support for ncurses" $<NOT:${IMTUI_EMSCRIPTEN}>)
+option(IMTUI_SUPPORT_NCURSES         "imtui: support for ncurses" ${IMTUI_SUPPORT_NCURSES_DEFAULT})
 
 option(IMTUI_BUILD_EXAMPLES          "imtui: build examples" ${IMTUI_STANDALONE})
 
@@ -55,8 +55,6 @@ if (IMTUI_SUPPORT_NCURSES)
 endif()
 
 # main
-
-find_package(Threads REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
