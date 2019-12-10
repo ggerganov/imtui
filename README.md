@@ -8,7 +8,7 @@ ImTui is an immediate mode text-based user interface library. Supports 256 ANSI 
 
 ## Live demo in the browser
 
-Eventhough this library is supposed to be used in the terminal, for convenience here is an [Emscripten](https://emscripten.org) build to demonstrate what it would like, by simulating a console in the browser:
+Eventhough this library is supposed to be used in the terminal, for convenience here is an [Emscripten](https://emscripten.org) build to demonstrate what it would look like, by simulating a console in the browser:
 
 Demo: [imtui.ggerganov.com](https://imtui.ggerganov.com/) *(works best with **Chrome**)*
 
