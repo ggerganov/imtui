@@ -32,10 +32,19 @@ ImTui depends only on `libncurses`
 ```
 git clone https://github.com/ggerganov/imtui --recursive
 cd imtui
-mkdir build
-cd build
+mkdir build && cd build
 cmake ..
 make
 
 ./bin/imtui-example-ncurses0
+```
+
+### Emscripten:
+
+```
+git clone https://github.com/ggerganov/imtui --recursive
+cd imtui
+mkdir build && cd build
+emconfigure cmake ..
+make
 ```
