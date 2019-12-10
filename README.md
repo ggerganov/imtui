@@ -37,5 +37,5 @@ cd build
 cmake ..
 make
 
-./bin/example_ncurses0
+./bin/imtui-example-ncurses0
 ```
