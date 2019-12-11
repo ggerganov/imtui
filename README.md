@@ -29,7 +29,7 @@ ImTui depends only on `libncurses`
 
 ###  Linux and Mac:
 
-```
+```bash
 git clone https://github.com/ggerganov/imtui --recursive
 cd imtui
 mkdir build && cd build
@@ -41,7 +41,7 @@ make
 
 ### Emscripten:
 
-```
+```bash
 git clone https://github.com/ggerganov/imtui --recursive
 cd imtui
 mkdir build && cd build
