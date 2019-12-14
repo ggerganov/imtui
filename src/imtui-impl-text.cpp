@@ -218,7 +218,7 @@ void ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & scree
 
                             int xx = (x) + 1;
                             int yy = (y) + 0;
-                            if (xx < 0 || xx >= fb_width || yy < 0 || yy >= fb_height) {
+                            if (xx < clip_rect.x || xx >= clip_rect.z || yy < clip_rect.y || yy >= clip_rect.w) {
                             } else {
                                 screen.data[yy][xx].c = (col0 & 0xff000000) >> 24;
                                 screen.data[yy][xx].f = rgbToAnsi256(col0, false);

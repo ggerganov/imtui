@@ -57,6 +57,7 @@ bool ImTui_ImplNcurses_Init() {
 }
 
 void ImTui_ImplNcurses_Shutdown() {
+    endwin();
 }
 
 void ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen) {
