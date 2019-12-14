@@ -112,7 +112,7 @@ std::string getJSONForURI(std::string uri) {
     auto response_string = getJSONForURI_impl(uri);
 
 #ifndef __EMSCRIPTEN__
-    {
+    if (0) {
         std::ofstream fout(fname);
         fout.write(response_string.c_str(), response_string.size());
         fout.close();
