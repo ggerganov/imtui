@@ -12,7 +12,10 @@ ImTui is an immediate mode text-based user interface library. Supports 256 ANSI 
 
 Eventhough this library is supposed to be used in the terminal, for convenience here is an [Emscripten](https://emscripten.org) build to demonstrate what it would look like, by simulating a console in the browser:
 
-Demo: [imtui.ggerganov.com](https://imtui.ggerganov.com/) *(works best with **Chrome**)*
+- Demo 0: [imtui.ggerganov.com](https://imtui.ggerganov.com/) 
+- Demo 1: [hnterm.ggerganov.com](https://hnterm.ggerganov.com/)
+
+Note: the demos work best with **Chrome**
 
 ## Details
 
@@ -22,6 +25,7 @@ For basic usage of ImTui, check one of the available samples:
 
 - [example-ncurses0](https://github.com/ggerganov/imtui/blob/master/examples/ncurses0/main.cpp)
 - [example-emscripten0](https://github.com/ggerganov/imtui/blob/master/examples/emscripten0/main.cpp)
+- [hnterm](https://github.com/ggerganov/imtui/blob/master/examples/hnterm/) - a simple tool to browse Hacker News in the terminal
 
 *Note: the current implementation is experimental, so don't expect all things to work.*
 
