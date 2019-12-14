@@ -20,6 +20,12 @@
 #include <variant>
 #include <functional>
 
+#ifdef __EMSCRIPTEN__
+#define ENABLE_API_CACHE 0
+#else
+#define ENABLE_API_CACHE 0
+#endif
+
 // tmp
 #include <fstream>
 
@@ -97,7 +103,7 @@ std::string getJSONForURI(std::string uri) {
         ch = '-';
     }
 
-    if (0) {
+    if (ENABLE_API_CACHE) {
         std::ifstream fin(fname);
         if (fin.is_open() && fin.good()) {
             //printf("%s\n", uri.c_str());
@@ -112,7 +118,7 @@ std::string getJSONForURI(std::string uri) {
     auto response_string = getJSONForURI_impl(uri);
 
 #ifndef __EMSCRIPTEN__
-    if (0) {
+    if (ENABLE_API_CACHE) {
         std::ofstream fout(fname);
         fout.write(response_string.c_str(), response_string.size());
         fout.close();
@@ -154,6 +160,7 @@ struct Story {
     ItemIds kids;
     int score = 0;
     uint64_t time = 0;
+    std::string text = "";
     std::string title = "";
     std::string url = "";
     std::string domain = "";
@@ -345,6 +352,11 @@ void parseStory(const ItemData & data, Story & res) {
     }
     res.score = std::stoi(data.at("score"));
     res.time = std::stoll(data.at("time"));
+    try {
+        res.text = parseHTML(data.at("text"));
+    } catch (...) {
+        res.text = "";
+    }
     try {
         res.title = parseHTML(data.at("title"));
     } catch (...) {
@@ -801,6 +813,14 @@ extern "C" {
                 } else {
                     const auto & story = std::get<HN::Story>(items.at(window.selectedStoryId).data);
 
+                    ImGui::Text("%s", story.title.c_str());
+                    ImGui::TextDisabled("%d points by %s %s ago | %d comments", story.score, story.by.c_str(), ::timeSince(story.time).c_str(), story.descendants);
+                    if (story.text.empty() == false) {
+                        ImGui::Text("%s", story.text.c_str());
+                    }
+
+                    ImGui::Text("%s", "");
+
                     int curCommentId = 0;
 
                     std::function<void(const HN::ItemIds & commentIds, int indent)> renderComments;
@@ -883,7 +903,9 @@ extern "C" {
                         }
                     };
 
+                    ImGui::BeginChild("##comments");
                     renderComments(story.kids, 0);
+                    ImGui::EndChild();
 
                     if (windowId == stateUI.hoveredWindowId) {
                         if (ImGui::IsKeyPressed('k', true) ||
@@ -902,6 +924,10 @@ extern "C" {
 
                         if (ImGui::IsKeyPressed('G', true)) {
                             window.hoveredCommentId = curCommentId - 1;
+                        }
+
+                        if (ImGui::IsKeyPressed('o', false) || ImGui::IsKeyPressed('O', false)) {
+                            openInBrowser(story.url);
                         }
 
                         if (ImGui::IsMouseClicked(1) ||
