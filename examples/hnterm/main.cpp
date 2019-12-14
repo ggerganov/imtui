@@ -919,15 +919,15 @@ extern "C" {
                 ImGui::End();
             }
 
-            if (ImGui::IsKeyPressed('k', true) ||
-                ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow], true)) {
-                stateUI.hoveredWindowId = std::max(0, stateUI.hoveredWindowId - 1);
-            }
+            //if (ImGui::IsKeyPressed('h', true) ||
+            //    ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow], true)) {
+            //    stateUI.hoveredWindowId = std::max(0, stateUI.hoveredWindowId - 1);
+            //}
 
-            if (ImGui::IsKeyPressed('l', true) ||
-                ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_RightArrow], true)) {
-                stateUI.hoveredWindowId = std::min(stateUI.nWindows - 1, stateUI.hoveredWindowId + 1);
-            }
+            //if (ImGui::IsKeyPressed('l', true) ||
+            //    ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_RightArrow], true)) {
+            //    stateUI.hoveredWindowId = std::min(stateUI.nWindows - 1, stateUI.hoveredWindowId + 1);
+            //}
 
             if (stateUI.showStatusWindow) {
                 {
