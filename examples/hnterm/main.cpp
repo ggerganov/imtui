@@ -565,7 +565,7 @@ struct State {
     bool showHelpModal = false;
     bool showStatusWindow = true;
 
-    int nWindows = 1;
+    int nWindows = 2;
 
     std::map<int, bool> collapsed;
 
