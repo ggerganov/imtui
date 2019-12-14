@@ -77,6 +77,7 @@ void ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen) {
     static int mx = 0;
     static int my = 0;
     static int lbut = 0;
+    static int rbut = 0;
     static unsigned long mstate = 0;
     static char input[3];
 
@@ -92,7 +93,10 @@ void ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen) {
         int c = wgetch(stdscr);
 
         if (c == ERR) {
-            if ((mstate & 0xf) == 0x1) lbut = 0;
+            if ((mstate & 0xf) == 0x1) {
+                lbut = 0;
+                rbut = 0;
+            }
             break;
         } else if (c == KEY_MOUSE) {
             MEVENT event;
@@ -100,10 +104,11 @@ void ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen) {
                 mx = event.x;
                 my = event.y;
                 mstate = event.bstate;
-                if ((mstate & 0xf) == 0x2) lbut = 1;
-                if ((mstate & 0xf) == 0x1) lbut = 0;
-                if ((mstate & 0xf) == 0x2) lbut = 1;
-                if ((mstate & 0xf) == 0x1) lbut = 0;
+                if ((mstate & 0x000f) == 0x0002) lbut = 1;
+                if ((mstate & 0x000f) == 0x0001) lbut = 0;
+                if ((mstate & 0xf000) == 0x2000) rbut = 1;
+                if ((mstate & 0xf000) == 0x1000) rbut = 0;
+                //printf("mstate = 0x%016lx\n", mstate);
                 ImGui::GetIO().KeyCtrl |= ((mstate & 0x0F000000) == 0x01000000);
             }
         } else {
@@ -129,6 +134,7 @@ void ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen) {
     ImGui::GetIO().MousePos.x = mx;
     ImGui::GetIO().MousePos.y = my;
     ImGui::GetIO().MouseDown[0] = lbut;
+    ImGui::GetIO().MouseDown[1] = rbut;
 }
 
 void ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen) {
