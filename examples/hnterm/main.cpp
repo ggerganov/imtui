@@ -967,8 +967,8 @@ extern "C" {
                              ImGuiWindowFlags_NoMove);
                 {
                     std::lock_guard<std::mutex> lock(g_mutex);
-                    ImGui::Text(" Last API request : %s", g_curURI);
                     ImGui::Text(" API requests     : %d / %d B (next update in %d s)", g_nfetches, (int) g_totalBytesDownloaded, g_nextUpdate);
+                    ImGui::Text(" Last API request : %s", g_curURI);
                     ImGui::Text(" Source code      : https://github.com/ggerganov/imtui/tree/master/examples/hnterm");
                 }
                 ImGui::End();
