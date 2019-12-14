@@ -10,6 +10,7 @@ target_link_libraries(imtui-examples-common PRIVATE
 
 if (EMSCRIPTEN)
     add_subdirectory(emscripten0)
+    add_subdirectory(hnterm)
     return()
 endif()
 

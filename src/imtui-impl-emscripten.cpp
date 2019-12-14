@@ -109,6 +109,10 @@ void set_mouse_wheel(float x, float y) {
 EMSCRIPTEN_KEEPALIVE
 void set_key_down(int key) {
     lastAddText.resize(1);
+    if (ImGui::GetIO().KeyShift == false && key >= 'A' && key <= 'Z') {
+        key += 'a' - 'A';
+    }
+
     if (lastKeysDown[17]) {
         (key == 65) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_A]] = true);
         (key == 67) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_C]] = true);
@@ -137,6 +141,10 @@ void set_key_down(int key) {
 
 EMSCRIPTEN_KEEPALIVE
 void set_key_up(int key) {
+    if (ImGui::GetIO().KeyShift == false && key >= 'A' && key <= 'Z') {
+        key += 'a' - 'A';
+    }
+
     lastKeysDown[key] = false;
 
     if (key == 16) {

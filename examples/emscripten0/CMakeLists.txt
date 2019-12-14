@@ -1,6 +1,18 @@
-set(EMSCRIPTEN_TARGET imtui-example-emscripten0)
-add_executable(${EMSCRIPTEN_TARGET} main.cpp)
-target_include_directories(${EMSCRIPTEN_TARGET} PRIVATE ..)
-target_link_libraries(${EMSCRIPTEN_TARGET} PRIVATE imtui-core imtui-examples-common imtui-emscripten)
+set(TARGET imtui-example-emscripten0)
+
+add_executable(${TARGET}
+    main.cpp
+    )
+
+target_include_directories(${TARGET} PRIVATE
+    ..
+    )
+
+target_link_libraries(${TARGET} PRIVATE
+    imtui-core
+    imtui-examples-common
+    imtui-emscripten
+    )
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/index-tmpl.html ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/style.css ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/style.css @ONLY)
