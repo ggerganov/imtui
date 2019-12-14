@@ -1,6 +1,6 @@
 # hnterm
 
-<a href="https://i.imgur.com/IQNIIbB.png" target="_blank">![hnterm-screenshot-0](https://i.imgur.com/IQNIIbB.png)</a>
+[![hnterm-demo](https://asciinema.org/a/gJakwNnEcgmGzZYiYIzFA1n8R.svg)](https://asciinema.org/a/gJakwNnEcgmGzZYiYIzFA1n8R)
 
 ## Live demo in the browser
 
