@@ -179,6 +179,10 @@ void set_key_up(int key) {
 
 EMSCRIPTEN_KEEPALIVE
 void set_key_press(int key) {
+    if (ImGui::GetIO().KeyShift == false && key >= 'A' && key <= 'Z') {
+        key += 'a' - 'A';
+    }
+
     if (key > 0) {
         lastAddText.resize(1);
         lastAddText[0] = key;
