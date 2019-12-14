@@ -1,5 +1,7 @@
 set(TARGET imtui-example-emscripten0)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${TARGET})
+
 add_executable(${TARGET}
     main.cpp
     )
