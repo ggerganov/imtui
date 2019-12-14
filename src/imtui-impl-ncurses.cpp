@@ -9,6 +9,7 @@
 #include <ncurses.h>
 
 #include <map>
+#include <string>
 
 bool ImTui_ImplNcurses_Init(bool mouseSupport) {
     initscr();
