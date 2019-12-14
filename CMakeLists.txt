@@ -12,9 +12,11 @@ endif()
 
 if (EMSCRIPTEN)
     set(IMTUI_SUPPORT_NCURSES_DEFAULT OFF)
+    set(IMTUI_SUPPORT_CURL_DEFAULT OFF)
     set(IMTUI_LIBRARY_TYPE STATIC)
 else()
     set(IMTUI_SUPPORT_NCURSES_DEFAULT ON)
+    set(IMTUI_SUPPORT_CURL_DEFAULT ON)
     set(IMTUI_LIBRARY_TYPE SHARED)
 endif()
 
@@ -27,7 +29,8 @@ option(IMTUI_SANITIZE_THREAD         "imtui: enable thread sanitizer" OFF)
 option(IMTUI_SANITIZE_ADDRESS        "imtui: enable address sanitizer" OFF)
 option(IMTUI_SANITIZE_UNDEFINED      "imtui: enable undefined sanitizer" OFF)
 
-option(IMTUI_SUPPORT_NCURSES         "imtui: support for ncurses" ${IMTUI_SUPPORT_NCURSES_DEFAULT})
+option(IMTUI_SUPPORT_NCURSES         "imtui: support for libncurses" ${IMTUI_SUPPORT_NCURSES_DEFAULT})
+option(IMTUI_SUPPORT_CURL            "imtui: support for libcurl" ${IMTUI_SUPPORT_CURL_DEFAULT})
 
 option(IMTUI_BUILD_EXAMPLES          "imtui: build examples" ${IMTUI_STANDALONE})
 
@@ -52,6 +55,10 @@ endif()
 
 if (IMTUI_SUPPORT_NCURSES)
     find_package(Curses REQUIRED)
+endif()
+
+if (IMTUI_SUPPORT_CURL)
+    find_package(CURL REQUIRED)
 endif()
 
 # main

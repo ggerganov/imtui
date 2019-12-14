@@ -10,19 +10,21 @@
 
 #include <map>
 
-bool ImTui_ImplNcurses_Init() {
+bool ImTui_ImplNcurses_Init(bool mouseSupport) {
     initscr();
     use_default_colors();
     start_color();
     cbreak();
     noecho();
     curs_set(0);
-    mouseinterval(0);
-    //halfdelay(1);
     nodelay(stdscr, TRUE);
     keypad(stdscr, TRUE);
-    mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-    printf("\033[?1003h\n"); // Makes the terminal report mouse movement events
+
+    if (mouseSupport) {
+        mouseinterval(0);
+        mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
+        printf("\033[?1003h\n");
+    }
 
     ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
     ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]   = 260;

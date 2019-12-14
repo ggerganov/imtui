@@ -12,7 +12,7 @@ int main() {
     VSync vsync;
     ImTui::TScreen screen;
 
-    ImTui_ImplNcurses_Init();
+    ImTui_ImplNcurses_Init(true);
     ImTui_ImplText_Init();
 
     bool demo = true;

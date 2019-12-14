@@ -13,4 +13,10 @@ if (EMSCRIPTEN)
     return()
 endif()
 
-add_subdirectory(ncurses0)
+if (IMTUI_SUPPORT_NCURSES)
+    add_subdirectory(ncurses0)
+
+    if (IMTUI_SUPPORT_CURL)
+        add_subdirectory(hnterm)
+    endif()
+endif()
