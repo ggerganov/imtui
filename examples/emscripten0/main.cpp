@@ -59,7 +59,7 @@ int main() {
     ImGui::CreateContext();
 
     ImTui_ImplText_Init();
-    ImTui_ImplEmscripten_Init();
+    ImTui_ImplEmscripten_Init(true);
 
     return 0;
 }

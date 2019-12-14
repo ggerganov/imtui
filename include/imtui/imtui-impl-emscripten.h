@@ -8,7 +8,7 @@ namespace ImTui {
 struct TScreen;
 }
 
-bool ImTui_ImplEmscripten_Init();
+bool ImTui_ImplEmscripten_Init(bool mouseSupport);
 void ImTui_ImplEmscripten_Shutdown();
 void ImTui_ImplEmscripten_NewFrame(ImTui::TScreen & screen);
 

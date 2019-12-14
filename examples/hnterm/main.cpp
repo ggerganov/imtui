@@ -1056,7 +1056,7 @@ int main(int argc, char ** argv) {
     ImGui::CreateContext();
 
 #ifdef __EMSCRIPTEN__
-    ImTui_ImplEmscripten_Init();
+    ImTui_ImplEmscripten_Init(false);
 #else
     ImTui_ImplNcurses_Init(mouseSupport != 0);
 #endif

@@ -11,6 +11,7 @@
 #include <string>
 
 // client input
+static bool ignoreMouse = false;
 static ImVec2 lastMousePos = { 0.0, 0.0 };
 static bool  lastMouseDown[5] = { false, false, false, false, false };
 static float lastMouseWheel = 0.0;
@@ -19,7 +20,7 @@ static float lastMouseWheelH = 0.0;
 static std::string lastAddText = "";
 static bool lastKeysDown[512];
 
-bool ImTui_ImplEmscripten_Init() {
+bool ImTui_ImplEmscripten_Init(bool mouseSupport) {
     ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
     ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]   = 37;
     ImGui::GetIO().KeyMap[ImGuiKey_RightArrow]  = 39;
@@ -42,6 +43,8 @@ bool ImTui_ImplEmscripten_Init() {
     ImGui::GetIO().KeyMap[ImGuiKey_X]           = 3;
     ImGui::GetIO().KeyMap[ImGuiKey_Y]           = 4;
     ImGui::GetIO().KeyMap[ImGuiKey_Z]           = 5;
+
+    ignoreMouse = !mouseSupport;
 
     return true;
 }
@@ -82,12 +85,16 @@ void ImTui_ImplEmscripten_NewFrame(ImTui::TScreen & screen) {
 
 EMSCRIPTEN_KEEPALIVE
 void set_mouse_pos(float x, float y) {
+    if (ignoreMouse) return;
+
     lastMousePos.x = x;
     lastMousePos.y = y;
 }
 
 EMSCRIPTEN_KEEPALIVE
 void set_mouse_down(int but, float x, float y) {
+    if (ignoreMouse) return;
+
     lastMouseDown[but] = true;
     lastMousePos.x = x;
     lastMousePos.y = y;
@@ -95,6 +102,8 @@ void set_mouse_down(int but, float x, float y) {
 
 EMSCRIPTEN_KEEPALIVE
 void set_mouse_up(int but, float x, float y) {
+    if (ignoreMouse) return;
+
     lastMouseDown[but] = false;
     lastMousePos.x = x;
     lastMousePos.y = y;
@@ -102,6 +111,8 @@ void set_mouse_up(int but, float x, float y) {
 
 EMSCRIPTEN_KEEPALIVE
 void set_mouse_wheel(float x, float y) {
+    if (ignoreMouse) return;
+
     lastMouseWheelH = x;
     lastMouseWheel  = y;
 }
