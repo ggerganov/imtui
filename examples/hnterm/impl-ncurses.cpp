@@ -30,6 +30,11 @@ void hnFree() {
     g_curl = NULL;
 }
 
+int openInBrowser(std::string uri) {
+    std::string cmd = "xdg-open " + uri;
+    return system(cmd.c_str());
+}
+
 size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
     data->append((char*) ptr, size * nmemb);
     return size * nmemb;

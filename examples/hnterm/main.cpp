@@ -32,6 +32,7 @@ ImTui::TScreen screen;
 
 extern bool hnInit();
 extern void hnFree();
+extern int openInBrowser(std::string uri);
 extern std::string getJSONForURI_impl(std::string uri);
 
 namespace {
@@ -727,6 +728,10 @@ extern "C" {
                             p1.x += ImGui::CalcTextSize(story.title.c_str()).x + 4;
 
                             ImGui::GetWindowDrawList()->AddRectFilled(p0, p1, ImGui::GetColorU32(col0));
+
+                            if (ImGui::IsKeyPressed('o', false) || ImGui::IsKeyPressed('O', false)) {
+                                openInBrowser(story.url);
+                            }
                         }
 
                         bool isHovered = false;
@@ -980,6 +985,7 @@ extern "C" {
                 ImGui::Text("    s           - toggle Status window    ");
                 ImGui::Text("    g           - go to top    ");
                 ImGui::Text("    G           - go to end    ");
+                ImGui::Text("    o/O         - open in browser    ");
                 ImGui::Text("    up/down/j/k - navigate items    ");
                 ImGui::Text("    left/right  - navigate windows    ");
                 ImGui::Text("    Tab         - change current window content    ");

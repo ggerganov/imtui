@@ -14,6 +14,12 @@ bool hnInit() {
 void hnFree() {
 }
 
+int openInBrowser(std::string uri) {
+    std::string cmd = "window.open('" + uri + "');";
+    emscripten_run_script(cmd.c_str());
+    return 0;
+}
+
 std::string getJSONForURI_impl(std::string uri) {
     std::string res = "";
 
