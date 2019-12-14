@@ -1,8 +1,8 @@
 set(TARGET hnterm)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${TARGET})
-
 if (EMSCRIPTEN)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${TARGET})
+
     add_executable(${TARGET}
         main.cpp
         impl-emscripten.cpp
