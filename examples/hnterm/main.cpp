@@ -813,6 +813,8 @@ extern "C" {
                 } else {
                     const auto & story = std::get<HN::Story>(items.at(window.selectedStoryId).data);
 
+                    toRefreshFG.push_back(story.id);
+
                     ImGui::Text("%s", story.title.c_str());
                     ImGui::TextDisabled("%d points by %s %s ago | %d comments", story.score, story.by.c_str(), ::timeSince(story.time).c_str(), story.descendants);
                     if (story.text.empty() == false) {
