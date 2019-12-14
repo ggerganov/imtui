@@ -12,6 +12,7 @@
 #include "imtui-common.h"
 
 #include <map>
+#include <atomic>
 #include <vector>
 #include <string>
 #include <mutex>
@@ -23,7 +24,7 @@
 #include <fstream>
 
 std::mutex g_mutex;
-bool g_keepRunning = true;
+std::atomic<bool> g_keepRunning = true;
 uint64_t g_totalBytesDownloaded = 0;
 int g_nfetches = 0;
 int g_nextUpdate = 0;
@@ -648,9 +649,9 @@ extern "C" {
 
     EMSCRIPTEN_KEEPALIVE
         bool render_frame() {
-            if (stateHNUpdated) {
-                {
-                    std::lock_guard<std::mutex> lock(mutex);
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+                if (stateHNUpdated) {
                     stateHNUpdated = false;
                     stateHNFG = stateHNBuf;
                 }
