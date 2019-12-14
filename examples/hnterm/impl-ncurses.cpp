@@ -31,7 +31,7 @@ void hnFree() {
 }
 
 int openInBrowser(std::string uri) {
-    std::string cmd = "xdg-open " + uri;
+    std::string cmd = "xdg-open " + uri + " > /dev/null 2>&1";
     return system(cmd.c_str());
 }
 
