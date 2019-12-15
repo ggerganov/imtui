@@ -147,10 +147,12 @@ void ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen) {
     int nx = screen.data[0].size();
     int ny = screen.data.size();
 
+    int ic = 0;
+    std::vector<uint8_t> curs(nx + 1);
+
     for (int y = 0; y < ny; ++y) {
         int lastp = -1;
-        int lastx = 0;
-        std::string curs = "";
+        move(y, 0);
         for (int x = 0; x < nx; ++x) {
             int f = screen.data[y][x].f;
             int b = screen.data[y][x].b;
@@ -164,18 +166,22 @@ void ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen) {
 
             if (lastp != pairs[p]) {
                 if (curs.size() > 0) {
-                    mvprintw(y, lastx, "%s", curs.c_str());
-                    curs = "";
+                    curs[ic] = 0;
+                    addstr((char *) curs.data());
+                    ic = 0;
+                    curs[0] = 0;
                 }
                 attron(COLOR_PAIR(pairs[p]));
-                lastx = x;
                 lastp = pairs[p];
             }
-            curs += screen.data[y][x].c > 0 ? screen.data[y][x].c : '.';
+            curs[ic++] = screen.data[y][x].c > 0 ? screen.data[y][x].c : '.';
         }
 
         if (curs.size() > 0) {
-            mvprintw(y, lastx, "%s", curs.c_str());
+            curs[ic] = 0;
+            addstr((char *) curs.data());
+            ic = 0;
+            curs[0] = 0;
         }
     }
 }
