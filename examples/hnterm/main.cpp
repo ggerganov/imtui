@@ -367,7 +367,11 @@ void parseStory(const ItemData & data, Story & res) {
     } catch (...) {
         res.by = "[deleted]";
     }
-    res.descendants = std::stoi(data.at("descendants"));
+    try {
+        res.descendants = std::stoi(data.at("descendants"));
+    } catch (...) {
+        res.descendants = 0;
+    }
     res.id = std::stoi(data.at("id"));
     try {
         res.kids = parseJSONIntArray(data.at("kids"));
