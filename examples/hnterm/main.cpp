@@ -800,7 +800,8 @@ extern "C" {
                 ImGui::Begin(title.c_str(), nullptr,
                              ImGuiWindowFlags_NoCollapse |
                              ImGuiWindowFlags_NoResize |
-                             ImGuiWindowFlags_NoMove);
+                             ImGuiWindowFlags_NoMove |
+                             ImGuiWindowFlags_NoScrollbar);
 
                 ImGui::Text("%s", "");
                 if (window.showComments == false) {
@@ -950,7 +951,7 @@ extern "C" {
 
                                 ImGui::GetWindowDrawList()->AddRectFilled(p0, p1, ImGui::GetColorU32(col0));
 
-                                if (ImGui::GetCursorScreenPos().y < 0) {
+                                if (ImGui::GetCursorScreenPos().y < 4) {
                                     ImGui::SetScrollHereY(0.0f);
                                 }
                             }
@@ -974,7 +975,7 @@ extern "C" {
                             }
 
                             if (windowId == stateUI.hoveredWindowId && curCommentId == window.hoveredCommentId) {
-                                if (ImGui::GetCursorScreenPos().y > ImGui::GetWindowSize().y) {
+                                if (ImGui::GetCursorScreenPos().y > ImGui::GetWindowSize().y + 4) {
                                     ImGui::SetScrollHereY(1.0f);
                                 }
 
@@ -1002,7 +1003,7 @@ extern "C" {
                         }
                     };
 
-                    ImGui::BeginChild("##comments");
+                    ImGui::BeginChild("##comments", ImVec2(0, 0), false, ImGuiWindowFlags_NoScrollbar);
                     renderComments(story.kids, 0);
                     ImGui::EndChild();
 
