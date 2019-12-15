@@ -1,3 +1,10 @@
+/*! \file main.cpp
+ *  \brief HNTerm - browse Hacker News in the terminal
+ *
+ * warning : ugly code below
+ *
+ */
+
 #include "imtui/imtui.h"
 
 #ifdef __EMSCRIPTEN__
@@ -41,6 +48,7 @@ extern bool hnInit();
 extern void hnFree();
 extern int openInBrowser(std::string uri);
 extern std::string getJSONForURI_impl(std::string uri);
+extern std::string getJSONForURI_cache(std::string uri);
 
 namespace {
 
@@ -85,14 +93,24 @@ inline std::string timeSince(uint64_t t) {
     return std::to_string(delta/24/3600) + " days";
 }
 
-std::string getJSONForURI(std::string uri) {
+void requestJSONForURI(std::string uri) {
     {
         std::lock_guard<std::mutex> lock(g_mutex);
         ++g_nfetches;
         snprintf(g_curURI, 512, "%s", uri.c_str());
     }
 
+    getJSONForURI_impl(uri);
+}
+
+std::string getJSONForURI(std::string uri) {
 #ifndef __EMSCRIPTEN__
+    {
+        std::lock_guard<std::mutex> lock(g_mutex);
+        ++g_nfetches;
+        snprintf(g_curURI, 512, "%s", uri.c_str());
+    }
+
     std::string fname = "cache-" + uri;
     for (auto & ch : fname) {
         if ((ch >= 'a' && ch <= 'z') ||
@@ -113,16 +131,19 @@ std::string getJSONForURI(std::string uri) {
             return str;
         }
     }
-#endif
 
     auto response_string = getJSONForURI_impl(uri);
 
-#ifndef __EMSCRIPTEN__
     if (ENABLE_API_CACHE) {
         std::ofstream fout(fname);
         fout.write(response_string.c_str(), response_string.size());
         fout.close();
     }
+#else
+
+    auto response_string = getJSONForURI_cache(uri);
+    if (response_string == "") return "";
+
 #endif
 
     {
@@ -192,6 +213,7 @@ struct Item {
     ItemType type = ItemType::Unknown;
 
     bool needUpdate = true;
+    bool needRequest = true;
 
     std::variant<Story, Comment> data;
 };
@@ -380,15 +402,6 @@ void parseStory(const ItemData & data, Story & res) {
     }
 }
 
-Story getStory(ItemId id) {
-    Story res;
-
-    auto data = parseJSONMap(getJSONForURI(getItemURI(id)));
-    parseStory(data, res);
-
-    return res;
-}
-
 void parseComment(const ItemData & data, Comment & res) {
     try {
         res.by = data.at("by");
@@ -408,15 +421,6 @@ void parseComment(const ItemData & data, Comment & res) {
         res.text = "";
     }
     res.time = std::stoll(data.at("time"));
-}
-
-Comment getComment(ItemId id) {
-    Comment res;
-
-    auto data = parseJSONMap(getJSONForURI(getItemURI(id)));
-    parseComment(data, res);
-
-    return res;
 }
 
 ItemIds getStoriesIds(URI uri) {
@@ -439,15 +443,15 @@ struct State {
         auto now = ::t_s();
         bool hasChange = false;
 
+#ifdef __EMSCRIPTEN__
         if (timeout(now, lastStoriesPoll_s)) {
-            idsTop = HN::getStoriesIds(HN::kAPITopStories);
-            //idsBest = HN::getStoriesIds(HN::kAPIBestStories);
-            idsShow = HN::getStoriesIds(HN::kAPIShowStories);
-            idsAsk = HN::getStoriesIds(HN::kAPIAskStories);
-            idsNew = HN::getStoriesIds(HN::kAPINewStories);
+            ::requestJSONForURI(HN::kAPITopStories);
+            //::requestJSONForURI(HN::kAPIBestStories);
+            ::requestJSONForURI(HN::kAPIShowStories);
+            ::requestJSONForURI(HN::kAPIAskStories);
+            ::requestJSONForURI(HN::kAPINewStories);
 
             lastStoriesPoll_s = ::t_s();
-            hasChange = true;
         } else {
             {
                 std::lock_guard<std::mutex> lock(g_mutex);
@@ -456,19 +460,99 @@ struct State {
         }
 
         if (timeout(now, lastUpdatePoll_s)) {
+            ::requestJSONForURI(HN::kAPIUpdates);
+
+            lastUpdatePoll_s = ::t_s();
+        }
+#endif
+
+#ifdef __EMSCRIPTEN__
+        {
+#else
+        if (timeout(now, lastStoriesPoll_s)) {
+#endif
+            {
+                auto ids = HN::getStoriesIds(HN::kAPITopStories);
+                if (ids.empty() == false) {
+                    idsTop = std::move(ids);
+                    hasChange = true;
+                }
+            }
+
+            //{
+            //    auto ids = HN::getStoriesIds(HN::kAPIBestStories);
+            //    if (ids.empty() == false) {
+            //        idsBest = std::move(ids);
+            //        hasChange = true;
+            //    }
+            //}
+
+            {
+                auto ids = HN::getStoriesIds(HN::kAPIShowStories);
+                if (ids.empty() == false) {
+                    idsShow = std::move(ids);
+                    hasChange = true;
+                }
+            }
+
+            {
+                auto ids = HN::getStoriesIds(HN::kAPIAskStories);
+                if (ids.empty() == false) {
+                    idsAsk = std::move(ids);
+                    hasChange = true;
+                }
+            }
+
+            {
+                auto ids = HN::getStoriesIds(HN::kAPINewStories);
+                if (ids.empty() == false) {
+                    idsNew = std::move(ids);
+                    hasChange = true;
+                }
+            }
+
+#ifndef __EMSCRIPTEN__
+            lastStoriesPoll_s = ::t_s();
+        } else {
+            {
+                std::lock_guard<std::mutex> lock(g_mutex);
+                g_nextUpdate = lastStoriesPoll_s + 30 - now;
+            }
+#endif
+        }
+
+#ifdef __EMSCRIPTEN__
+        {
+#else
+        if (timeout(now, lastUpdatePoll_s)) {
+#endif
             auto ids = HN::getChangedItemsIds();
             for (auto id : ids) {
                 items[id].needUpdate = true;
+                items[id].needRequest = true;
             }
 
+#ifndef __EMSCRIPTEN__
             lastUpdatePoll_s = ::t_s();
-            hasChange = true;
+#endif
         }
+
+#ifdef __EMSCRIPTEN__
+        for (auto id : toRefresh) {
+            if (items[id].needRequest == false) continue;
+
+            ::requestJSONForURI(getItemURI(id));
+            items[id].needRequest = false;
+        }
+#endif
 
         for (auto id : toRefresh) {
             if (items[id].needUpdate == false) continue;
 
-            const auto data = getItemDataFromJSON(getJSONForURI(getItemURI(id)));
+            const auto json = getJSONForURI(getItemURI(id));
+            if (json == "") continue;
+
+            const auto data = getItemDataFromJSON(json);
             const auto type = getItemType(data);
             auto & item = items[id];
             switch (type) {
@@ -661,6 +745,10 @@ extern "C" {
 
     EMSCRIPTEN_KEEPALIVE
         bool render_frame() {
+#ifdef __EMSCRIPTEN__
+            updateHN();
+#endif
+
             {
                 std::lock_guard<std::mutex> lock(mutex);
                 if (stateHNUpdated) {
@@ -681,6 +769,10 @@ extern "C" {
 #ifndef __EMSCRIPTEN__
             ImGui::GetIO().DeltaTime = vsync.delta_s();
 #endif
+
+            if (ImGui::GetIO().DisplaySize.x < 50) {
+                stateUI.nWindows = 1;
+            }
 
             ImGui::NewFrame();
 
@@ -929,7 +1021,7 @@ extern "C" {
                         }
 
                         if (ImGui::IsKeyPressed('o', false) || ImGui::IsKeyPressed('O', false)) {
-                            openInBrowser(story.url);
+                            openInBrowser((std::string("https://news.ycombinator.com/item?id=") + std::to_string(story.id)).c_str());
                         }
 
                         if (ImGui::IsMouseClicked(1) ||
@@ -1008,6 +1100,11 @@ extern "C" {
             }
 
             if (ImGui::BeginPopupModal("Help", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+#ifdef __EMSCRIPTEN__
+                ImGui::Text("Emscripten port of HNTerm");
+                ImGui::Text("This demo is not suitable for mobile devices!");
+                ImGui::Text("---------------------------------------------");
+#endif
                 ImGui::Text("    h/H         - toggle Help window    ");
                 ImGui::Text("    s           - toggle Status window    ");
                 ImGui::Text("    g           - go to top    ");
@@ -1022,7 +1119,7 @@ extern "C" {
 
                 if (stateUI.showHelpModal) {
                     for (int i = 0; i < 512; ++i) {
-                        if (ImGui::IsKeyReleased(i)) {
+                        if (ImGui::IsKeyReleased(i) || ImGui::IsMouseDown(0)) {
                             ImGui::CloseCurrentPopup();
                             auto col = ImGui::GetStyleColorVec4(ImGuiCol_WindowBg);
                             col.w = 1.0;
@@ -1073,18 +1170,20 @@ int main(int argc, char ** argv) {
         return -1;
     }
 
+#ifndef __EMSCRIPTEN__
     workerHN = std::thread([&]() {
         while (g_keepRunning) {
             updateHN();
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     });
+#endif
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
 #ifdef __EMSCRIPTEN__
-    ImTui_ImplEmscripten_Init(false);
+    ImTui_ImplEmscripten_Init(true);
 #else
     ImTui_ImplNcurses_Init(mouseSupport != 0);
 #endif
