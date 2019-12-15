@@ -72,6 +72,8 @@
 
                 if (isMobile) {
                     Module._set_mouse_pos(mouse_x, mouse_y);
+                } else {
+                    Module._set_mouse_pos(-10, -10);
                 }
 
                 event.preventDefault();
