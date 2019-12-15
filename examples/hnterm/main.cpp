@@ -1095,18 +1095,24 @@ extern "C" {
 
             if (stateUI.showHelpWelcome || (stateUI.showHelpModal == false && (ImGui::IsKeyReleased('h') || ImGui::IsKeyReleased('H')))) {
                 stateUI.showHelpWelcome = false;
-                ImGui::OpenPopup("Help");
+                ImGui::OpenPopup("###Help");
                 auto col = ImGui::GetStyleColorVec4(ImGuiCol_WindowBg);
                 col.w *= 0.9;
                 ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = col;
             }
 
-            if (ImGui::BeginPopupModal("Help", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            if (ImGui::BeginPopupModal("HNTerm v0.1###Help", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 #ifdef __EMSCRIPTEN__
+                ImGui::Text(" ");
+                ImGui::Text("---------------------------------------------");
                 ImGui::Text("Emscripten port of HNTerm");
                 ImGui::Text("This demo is not suitable for mobile devices!");
                 ImGui::Text("---------------------------------------------");
 #endif
+                ImGui::Text(" ");
+                ImGui::Text("Interactive browsing of https://news.ycombinator.com/");
+                ImGui::Text("Content is automatically updated - no need to refresh ");
+                ImGui::Text(" ");
                 ImGui::Text("    h/H         - toggle Help window    ");
                 ImGui::Text("    s           - toggle Status window    ");
                 ImGui::Text("    g           - go to top    ");
@@ -1118,6 +1124,7 @@ extern "C" {
                 ImGui::Text("    1/2/3       - change number of windows    ");
                 ImGui::Text("    q/b/bkspc   - close comments    ");
                 ImGui::Text("    Q           - quit    ");
+                ImGui::Text(" ");
 
                 if (stateUI.showHelpModal) {
                     for (int i = 0; i < 512; ++i) {
