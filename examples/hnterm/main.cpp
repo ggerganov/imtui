@@ -875,8 +875,10 @@ extern "C" {
                     if (windowId == stateUI.hoveredWindowId) {
                         if (ImGui::IsMouseDoubleClicked(0) ||
                             ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Enter], false)) {
-                            window.showComments = true;
-                            window.selectedStoryId = storyIds[window.hoveredStoryId];
+                            if (stateUI.showHelpModal == false) {
+                                window.showComments = true;
+                                window.selectedStoryId = storyIds[window.hoveredStoryId];
+                            }
                         }
 
                         if (ImGui::IsKeyPressed('k', true) ||
