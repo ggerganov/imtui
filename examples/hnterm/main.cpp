@@ -334,6 +334,7 @@ std::string parseHTML(std::string str) {
     ::replaceAll(res, "”", "\"");
     ::replaceAll(res, "‘", "'");
     ::replaceAll(res, "’", "'");
+    ::replaceAll(res, "„", "'");
     ::replaceAll(res, "&quot;", "\"");
     return res;
 }
