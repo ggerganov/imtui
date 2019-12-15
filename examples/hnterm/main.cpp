@@ -333,6 +333,7 @@ std::string parseHTML(std::string str) {
     ::replaceAll(res, "“", "\"");
     ::replaceAll(res, "”", "\"");
     ::replaceAll(res, "‘", "'");
+    ::replaceAll(res, "’", "'");
     ::replaceAll(res, "&quot;", "\"");
     return res;
 }
@@ -912,7 +913,9 @@ extern "C" {
                     ImGui::Text("%s", story.title.c_str());
                     ImGui::TextDisabled("%d points by %s %s ago | %d comments", story.score, story.by.c_str(), ::timeSince(story.time).c_str(), story.descendants);
                     if (story.text.empty() == false) {
+                        ImGui::PushTextWrapPos(ImGui::GetContentRegionAvailWidth());
                         ImGui::Text("%s", story.text.c_str());
+                        ImGui::PopTextWrapPos();
                     }
 
                     ImGui::Text("%s", "");
