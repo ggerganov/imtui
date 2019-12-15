@@ -530,6 +530,7 @@ struct State {
 #endif
             auto ids = HN::getChangedItemsIds();
             for (auto id : ids) {
+                if (items.find(id) == items.end()) continue;
                 items[id].needUpdate = true;
                 items[id].needRequest = true;
             }
