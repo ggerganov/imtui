@@ -56,7 +56,7 @@ inline uint64_t t_s() {
 #ifdef __EMSCRIPTEN__
     return emscripten_date_now()*0.001f;
 #else
-    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count(); // duh ..
+    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); // duh ..
 #endif
 }
 
