@@ -597,14 +597,23 @@ struct State {
                     break;
                 case ItemType::Job:
                     {
+                        // temp
+                        hasChange = true;
+                        item.needUpdate = false;
                     }
                     break;
                 case ItemType::Poll:
                     {
+                        // temp
+                        hasChange = true;
+                        item.needUpdate = false;
                     }
                     break;
                 case ItemType::PollOpt:
                     {
+                        // temp
+                        hasChange = true;
+                        item.needUpdate = false;
                     }
                     break;
             };
