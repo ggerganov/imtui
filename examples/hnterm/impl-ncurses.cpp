@@ -11,6 +11,7 @@
 #include <curl/curl.h>
 
 #include <map>
+#include <array>
 #include <deque>
 #include <string>
 #include <chrono>
@@ -67,8 +68,11 @@ void hnFree() {
 }
 
 int openInBrowser(std::string uri) {
-    // todo : on Mac OS use "open"
+#ifdef __APPLE__
+    std::string cmd = "open " + uri + " > /dev/null 2>&1";
+#else
     std::string cmd = "xdg-open " + uri + " > /dev/null 2>&1";
+#endif
     return system(cmd.c_str());
 }
 
