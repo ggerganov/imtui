@@ -13,6 +13,10 @@
 static std::mutex g_mutex;
 static std::map<std::string, std::string> g_fetchCache;
 
+uint64_t t_s() {
+    return emscripten_date_now()*0.001f;
+}
+
 bool hnInit() {
     return true;
 }
@@ -23,6 +27,7 @@ void hnFree() {
 int openInBrowser(std::string uri) {
     std::string cmd = "window.open('" + uri + "');";
     emscripten_run_script(cmd.c_str());
+
     return 0;
 }
 
@@ -36,21 +41,22 @@ void downloadSucceeded(emscripten_fetch_t *fetch) {
 }
 
 void downloadFailed(emscripten_fetch_t *fetch) {
-    printf("Downloading %s failed, HTTP failure status code: %d.\n", fetch->url, fetch->status);
+    fprintf(stderr, "Downloading %s failed, HTTP failure status code: %d.\n", fetch->url, fetch->status);
     emscripten_fetch_close(fetch);
 }
 
-std::string getJSONForURI_cache(std::string uri) {
-    std::string res;
-    {
-        std::lock_guard<std::mutex> lock(g_mutex);
-        res = std::move(g_fetchCache[uri] );
-        g_fetchCache[uri] = "";
+std::string getJSONForURI_impl(const std::string & uri) {
+    if (auto it = g_fetchCache.find(uri); it != g_fetchCache.end()) {
+        auto res = std::move(g_fetchCache[uri]);
+        g_fetchCache.erase(it);
+
+        return res;
     }
-    return res;
+
+    return "";
 }
 
-std::string getJSONForURI_impl(std::string uri) {
+void requestJSONForURI_impl(std::string uri) {
     emscripten_fetch_attr_t attr;
     emscripten_fetch_attr_init(&attr);
     strcpy(attr.requestMethod, "GET");
@@ -58,25 +64,7 @@ std::string getJSONForURI_impl(std::string uri) {
     attr.onsuccess = downloadSucceeded;
     attr.onerror = downloadFailed;
     emscripten_fetch(&attr, uri.c_str());
+}
 
-    // Synchronous version - requires -s USE_PTHREADS=1
-    //emscripten_fetch_attr_t attr;
-    //emscripten_fetch_attr_init(&attr);
-    //strcpy(attr.requestMethod, "GET");
-    //attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS | EMSCRIPTEN_FETCH_WAITABLE;
-    //emscripten_fetch_t *fetch = emscripten_fetch(&attr, uri.c_str());
-    //assert(fetch != 0);
-    //memset(&attr, 0, sizeof(attr));
-    //emscripten_fetch_wait(fetch, 1000000);
-    //assert(fetch->data != 0);
-    //assert(fetch->numBytes > 0);
-    //assert(fetch->totalBytes == fetch->numBytes);
-    //assert(fetch->readyState == 4/*DONE*/);
-    //assert(fetch->status == 200);
-    //if (fetch->status == 200) {
-    //    res = std::string(fetch->data, fetch->numBytes-1);
-    //} else {
-    //}
-    //emscripten_fetch_close(fetch);
-    return "";
+void updateRequests_impl() {
 }

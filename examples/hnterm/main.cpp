@@ -1,64 +1,59 @@
 /*! \file main.cpp
  *  \brief HNTerm - browse Hacker News in the terminal
- *
- * warning : ugly code below
- *
  */
 
 #include "imtui/imtui.h"
 
-#ifdef __EMSCRIPTEN__
-#include "imtui/imtui-impl-emscripten.h"
-#include <emscripten.h>
-#include <emscripten/html5.h>
-#else
-#include "imtui/imtui-impl-ncurses.h"
-#define EMSCRIPTEN_KEEPALIVE
-#endif
-
+#include "json.h"
 #include "imtui-common.h"
 
+#ifdef __EMSCRIPTEN__
+
+#define ENABLE_API_CACHE 0
+
+#include "imtui/imtui-impl-emscripten.h"
+
+#include <emscripten.h>
+#include <emscripten/html5.h>
+
+#else
+
+#define ENABLE_API_CACHE 0
+#define EMSCRIPTEN_KEEPALIVE
+
+#include "imtui/imtui-impl-ncurses.h"
+
+#endif
+
 #include <map>
-#include <atomic>
 #include <vector>
 #include <string>
-#include <mutex>
-#include <thread>
 #include <variant>
 #include <functional>
-
-#ifdef __EMSCRIPTEN__
-#define ENABLE_API_CACHE 0
-#else
-#define ENABLE_API_CACHE 0
-#endif
 
 // tmp
 #include <fstream>
 
-std::mutex g_mutex;
-std::atomic<bool> g_keepRunning = true;
-uint64_t g_totalBytesDownloaded = 0;
+// global vars
+char g_curURI[512];
 int g_nfetches = 0;
 int g_nextUpdate = 0;
-char g_curURI[512];
+uint64_t g_totalBytesDownloaded = 0;
+
+// screen buffer
 ImTui::TScreen screen;
 
+// platform specific functions
 extern bool hnInit();
 extern void hnFree();
 extern int openInBrowser(std::string uri);
-extern std::string getJSONForURI_impl(std::string uri);
-extern std::string getJSONForURI_cache(std::string uri);
+extern void requestJSONForURI_impl(std::string uri);
+extern std::string getJSONForURI_impl(const std::string & uri);
+extern void updateRequests_impl();
+extern uint64_t t_s();
 
+// helper functions
 namespace {
-
-inline uint64_t t_s() {
-#ifdef __EMSCRIPTEN__
-    return emscripten_date_now()*0.001f;
-#else
-    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); // duh ..
-#endif
-}
 
 std::map<std::string, std::string> parseCmdArguments(int argc, char ** argv) {
     int last = argc;
@@ -84,7 +79,6 @@ void replaceAll(std::string & s, const std::string & search, const std::string &
     }
 }
 
-
 inline std::string timeSince(uint64_t t) {
     auto delta = t_s() - t;
     if (delta < 60) return std::to_string(delta) + " seconds";
@@ -94,23 +88,17 @@ inline std::string timeSince(uint64_t t) {
 }
 
 void requestJSONForURI(std::string uri) {
-    {
-        std::lock_guard<std::mutex> lock(g_mutex);
-        ++g_nfetches;
-        snprintf(g_curURI, 512, "%s", uri.c_str());
-    }
+    ++g_nfetches;
+    snprintf(g_curURI, 512, "%s", uri.c_str());
 
-    getJSONForURI_impl(uri);
+    requestJSONForURI_impl(std::move(uri));
 }
 
-std::string getJSONForURI(std::string uri) {
-#ifndef __EMSCRIPTEN__
-    {
-        std::lock_guard<std::mutex> lock(g_mutex);
-        ++g_nfetches;
-        snprintf(g_curURI, 512, "%s", uri.c_str());
-    }
+std::string getJSONForURI(const std::string & uri) {
+    auto response_string = getJSONForURI_impl(uri);
+    if (response_string == "") return "";
 
+#ifdef ENABLE_API_CACHE
     std::string fname = "cache-" + uri;
     for (auto & ch : fname) {
         if ((ch >= 'a' && ch <= 'z') ||
@@ -121,35 +109,24 @@ std::string getJSONForURI(std::string uri) {
         ch = '-';
     }
 
-    if (ENABLE_API_CACHE) {
-        std::ifstream fin(fname);
-        if (fin.is_open() && fin.good()) {
-            //printf("%s\n", uri.c_str());
-            std::string str((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
-            fin.close();
+    //if (ENABLE_API_CACHE) {
+    //    std::ifstream fin(fname);
+    //    if (fin.is_open() && fin.good()) {
+    //        std::string str((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
+    //        fin.close();
 
-            return str;
-        }
-    }
-
-    auto response_string = getJSONForURI_impl(uri);
+    //        return str;
+    //    }
+    //}
 
     if (ENABLE_API_CACHE) {
         std::ofstream fout(fname);
         fout.write(response_string.c_str(), response_string.size());
         fout.close();
     }
-#else
-
-    auto response_string = getJSONForURI_cache(uri);
-    if (response_string == "") return "";
-
 #endif
 
-    {
-        std::lock_guard<std::mutex> lock(g_mutex);
-        g_totalBytesDownloaded += response_string.size();
-    }
+    g_totalBytesDownloaded += response_string.size();
 
     return response_string;
 }
@@ -218,98 +195,7 @@ struct Item {
     std::variant<Story, Comment> data;
 };
 
-ItemIds parseJSONIntArray(const std::string json) {
-    ItemIds res;
-    if (json[0] != '[') return res;
-
-    int n = json.size();
-    int curid = 0;
-    for (int i = 1; i < n; ++i) {
-        if (json[i] == ' ') continue;
-        if (json[i] == ',') {
-            res.push_back(curid);
-            curid = 0;
-            continue;
-        }
-
-        if (json[i] == ']') {
-            res.push_back(curid);
-            break;
-        }
-
-        curid = 10*curid + json[i] - 48;
-    }
-
-    return res;
-}
-
-ItemData parseJSONMap(const std::string json) {
-    ItemData res;
-    if (json[0] != '{') return res;
-
-    bool hasKey = false;
-    bool inToken = false;
-
-    std::string strKey = "";
-    std::string strVal = "";
-
-    int n = json.size();
-    for (int i = 1; i < n; ++i) {
-        if (!inToken) {
-            if (json[i] == ' ') continue;
-            if (json[i] == '"' && json[i-1] != '\\') {
-                inToken = true;
-                continue;
-            }
-        } else {
-            if (json[i] == '"' && json[i-1] != '\\') {
-                if (hasKey == false) {
-                    hasKey = true;
-                    ++i;
-                    while (json[i] == ' ') ++i;
-                    ++i; // :
-                    while (json[i] == ' ') ++i;
-                    if (json[i] == '[') {
-                        while (json[i] != ']') {
-                            strVal += json[i++];
-                        }
-                        strVal += ']';
-                        hasKey = false;
-                        res[strKey] = strVal;
-                        strKey = "";
-                        strVal = "";
-                    } else if (json[i] != '\"') {
-                        while (json[i] != ',' && json[i] != '}') {
-                            strVal += json[i++];
-                        }
-                        hasKey = false;
-                        res[strKey] = strVal;
-                        strKey = "";
-                        strVal = "";
-                    } else {
-                        inToken = true;
-                        continue;
-                    }
-                } else {
-                    hasKey = false;
-                    res[strKey] = strVal;
-                    strKey = "";
-                    strVal = "";
-                }
-                inToken = false;
-                continue;
-            }
-            if (hasKey == false) {
-                strKey += json[i];
-            } else {
-                strVal += json[i];
-            }
-        }
-    }
-
-    return res;
-}
-
+// todo : optimize this
 std::string parseHTML(std::string str) {
     ::replaceAll(str, "<p>", "\n");
 
@@ -326,6 +212,7 @@ std::string parseHTML(std::string str) {
             }
         }
     }
+
     ::replaceAll(res, "&#x2F;", "/");
     ::replaceAll(res, "&#x27;", "'");
     ::replaceAll(res, "&gt;", ">");
@@ -336,15 +223,13 @@ std::string parseHTML(std::string str) {
     ::replaceAll(res, "’", "'");
     ::replaceAll(res, "„", "'");
     ::replaceAll(res, "&quot;", "\"");
+    ::replaceAll(res, "&amp;", "&");
+
     return res;
 }
 
 URI getItemURI(ItemId id) {
     return kAPIItem + std::to_string(id) + ".json";
-}
-
-ItemData getItemDataFromJSON(std::string json) {
-    return parseJSONMap(json);
 }
 
 ItemType getItemType(const ItemData & itemData) {
@@ -372,14 +257,26 @@ void parseStory(const ItemData & data, Story & res) {
     } catch (...) {
         res.descendants = 0;
     }
-    res.id = std::stoi(data.at("id"));
     try {
-        res.kids = parseJSONIntArray(data.at("kids"));
+        res.id = std::stoi(data.at("id"));
+    } catch (...) {
+        res.id = 0;
+    }
+    try {
+        res.kids = JSON::parseIntArray(data.at("kids"));
     } catch (...) {
         res.kids.clear();
     }
-    res.score = std::stoi(data.at("score"));
-    res.time = std::stoll(data.at("time"));
+    try {
+        res.score = std::stoi(data.at("score"));
+    } catch (...) {
+        res.score = 0;
+    }
+    try {
+        res.time = std::stoll(data.at("time"));
+    } catch (...) {
+        res.time = 0;
+    }
     try {
         res.text = parseHTML(data.at("text"));
     } catch (...) {
@@ -414,30 +311,40 @@ void parseComment(const ItemData & data, Comment & res) {
     } catch (...) {
         res.by = "[deleted]";
     }
-    res.id = std::stoi(data.at("id"));
     try {
-        res.kids = parseJSONIntArray(data.at("kids"));
+        res.id = std::stoi(data.at("id"));
+    } catch (...) {
+        res.id = 0;
+    }
+    try {
+        res.kids = JSON::parseIntArray(data.at("kids"));
     } catch (...) {
         res.kids.clear();
     }
-    res.parent = std::stoi(data.at("parent"));
+    try {
+        res.parent = std::stoi(data.at("parent"));
+    } catch (...) {
+        res.parent = 0;
+    }
     try {
         res.text = parseHTML(data.at("text"));
     } catch (...) {
         res.text = "";
     }
-    res.time = std::stoll(data.at("time"));
+    try {
+        res.time = std::stoll(data.at("time"));
+    } catch (...) {
+        res.time = 0;
+    }
 }
 
-ItemIds getStoriesIds(URI uri) {
-    std::string json = getJSONForURI(uri);
-    return parseJSONIntArray(json);
+ItemIds getStoriesIds(const URI & uri) {
+    return JSON::parseIntArray(getJSONForURI(uri));
 }
 
 ItemIds getChangedItemsIds() {
-    std::string json = getJSONForURI(HN::kAPIUpdates);
-    auto data = parseJSONMap(json);
-    return parseJSONIntArray(data["items"]);
+    auto data = JSON::parseJSONMap(getJSONForURI(HN::kAPIUpdates));
+    return JSON::parseIntArray(data["items"]);
 }
 
 struct State {
@@ -445,11 +352,9 @@ struct State {
         return now - last > 30;
     }
 
-    bool update(const ItemIds & toRefresh) {
+    void update(const ItemIds & toRefresh) {
         auto now = ::t_s();
-        bool hasChange = false;
 
-#ifdef __EMSCRIPTEN__
         if (timeout(now, lastStoriesPoll_s)) {
             ::requestJSONForURI(HN::kAPITopStories);
             //::requestJSONForURI(HN::kAPIBestStories);
@@ -459,10 +364,7 @@ struct State {
 
             lastStoriesPoll_s = ::t_s();
         } else {
-            {
-                std::lock_guard<std::mutex> lock(g_mutex);
-                g_nextUpdate = lastStoriesPoll_s + 30 - now;
-            }
+            g_nextUpdate = lastStoriesPoll_s + 30 - now;
         }
 
         if (timeout(now, lastUpdatePoll_s)) {
@@ -470,18 +372,12 @@ struct State {
 
             lastUpdatePoll_s = ::t_s();
         }
-#endif
 
-#ifdef __EMSCRIPTEN__
         {
-#else
-        if (timeout(now, lastStoriesPoll_s)) {
-#endif
             {
                 auto ids = HN::getStoriesIds(HN::kAPITopStories);
                 if (ids.empty() == false) {
                     idsTop = std::move(ids);
-                    hasChange = true;
                 }
             }
 
@@ -489,7 +385,6 @@ struct State {
             //    auto ids = HN::getStoriesIds(HN::kAPIBestStories);
             //    if (ids.empty() == false) {
             //        idsBest = std::move(ids);
-            //        hasChange = true;
             //    }
             //}
 
@@ -497,7 +392,6 @@ struct State {
                 auto ids = HN::getStoriesIds(HN::kAPIShowStories);
                 if (ids.empty() == false) {
                     idsShow = std::move(ids);
-                    hasChange = true;
                 }
             }
 
@@ -505,7 +399,6 @@ struct State {
                 auto ids = HN::getStoriesIds(HN::kAPIAskStories);
                 if (ids.empty() == false) {
                     idsAsk = std::move(ids);
-                    hasChange = true;
                 }
             }
 
@@ -513,45 +406,25 @@ struct State {
                 auto ids = HN::getStoriesIds(HN::kAPINewStories);
                 if (ids.empty() == false) {
                     idsNew = std::move(ids);
-                    hasChange = true;
                 }
             }
-
-#ifndef __EMSCRIPTEN__
-            lastStoriesPoll_s = ::t_s();
-        } else {
-            {
-                std::lock_guard<std::mutex> lock(g_mutex);
-                g_nextUpdate = lastStoriesPoll_s + 30 - now;
-            }
-#endif
         }
 
-#ifdef __EMSCRIPTEN__
         {
-#else
-        if (timeout(now, lastUpdatePoll_s)) {
-#endif
             auto ids = HN::getChangedItemsIds();
             for (auto id : ids) {
                 if (items.find(id) == items.end()) continue;
                 items[id].needUpdate = true;
                 items[id].needRequest = true;
             }
-
-#ifndef __EMSCRIPTEN__
-            lastUpdatePoll_s = ::t_s();
-#endif
         }
 
-#ifdef __EMSCRIPTEN__
         for (auto id : toRefresh) {
             if (items[id].needRequest == false) continue;
 
             ::requestJSONForURI(getItemURI(id));
             items[id].needRequest = false;
         }
-#endif
 
         for (auto id : toRefresh) {
             if (items[id].needUpdate == false) continue;
@@ -559,7 +432,7 @@ struct State {
             const auto json = getJSONForURI(getItemURI(id));
             if (json == "") continue;
 
-            const auto data = getItemDataFromJSON(json);
+            const auto data = JSON::parseJSONMap(json);
             const auto type = getItemType(data);
             auto & item = items[id];
             switch (type) {
@@ -575,7 +448,6 @@ struct State {
 
                         Story & story = std::get<Story>(item.data);
                         if (item.needUpdate) {
-                            hasChange = true;
                             parseStory(data, story);
                             item.needUpdate = false;
                         }
@@ -589,7 +461,6 @@ struct State {
 
                         Comment & story = std::get<Comment>(item.data);
                         if (item.needUpdate) {
-                            hasChange = true;
                             parseComment(data, story);
                             item.needUpdate = false;
                         }
@@ -598,21 +469,18 @@ struct State {
                 case ItemType::Job:
                     {
                         // temp
-                        hasChange = true;
                         item.needUpdate = false;
                     }
                     break;
                 case ItemType::Poll:
                     {
                         // temp
-                        hasChange = true;
                         item.needUpdate = false;
                     }
                     break;
                 case ItemType::PollOpt:
                     {
                         // temp
-                        hasChange = true;
                         item.needUpdate = false;
                     }
                     break;
@@ -620,8 +488,6 @@ struct State {
 
             break;
         }
-
-        return hasChange;
     }
 
     ItemIds idsTop;
@@ -703,39 +569,18 @@ struct State {
 
 }
 
-std::mutex mutex;
-std::thread workerHN;
-
+#ifndef __EMSCRIPTEN__
 VSync vsync;
+#endif
 
-bool stateHNUpdated = false;
+// HackerNews content
+HN::State stateHN;
 
-HN::State stateHNBG;
-HN::State stateHNBuf;
-HN::State stateHNFG;
+// items that need to be updated
+HN::ItemIds toRefresh;
 
-HN::ItemIds toRefreshBG;
-HN::ItemIds toRefreshBuf;
-HN::ItemIds toRefreshFG;
-
+// UI state
 UI::State stateUI;
-
-void updateHN() {
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        toRefreshBG = toRefreshBuf;
-    }
-
-    bool needUpdate = stateHNBG.update(toRefreshBG);
-
-    if (needUpdate) {
-        {
-            std::lock_guard<std::mutex> lock(mutex);
-            stateHNUpdated = true;
-            stateHNBuf = stateHNBG;
-        }
-    }
-}
 
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
@@ -761,19 +606,10 @@ extern "C" {
 
     EMSCRIPTEN_KEEPALIVE
         bool render_frame() {
-#ifdef __EMSCRIPTEN__
-            updateHN();
-#endif
+            stateHN.update(toRefresh);
+            updateRequests_impl();
 
-            {
-                std::lock_guard<std::mutex> lock(mutex);
-                if (stateHNUpdated) {
-                    stateHNUpdated = false;
-                    stateHNFG = stateHNBuf;
-                }
-            }
-
-            toRefreshFG.clear();
+            toRefresh.clear();
 
 #ifdef __EMSCRIPTEN__
             ImTui_ImplEmscripten_NewFrame(screen);
@@ -793,7 +629,7 @@ extern "C" {
             ImGui::NewFrame();
 
             for (int windowId = 0; windowId < stateUI.nWindows; ++windowId) {
-                const auto & items = stateHNFG.items;
+                const auto & items = stateHN.items;
                 auto & window = stateUI.windows[windowId];
 
                 {
@@ -821,16 +657,16 @@ extern "C" {
                 ImGui::Text("%s", "");
                 if (window.showComments == false) {
                     const auto & storyIds =
-                        (window.content == UI::WindowContent::Top) ? stateHNFG.idsTop :
-                        (window.content == UI::WindowContent::Show) ? stateHNFG.idsShow :
-                        (window.content == UI::WindowContent::New) ? stateHNFG.idsNew :
-                        stateHNFG.idsTop;
+                        (window.content == UI::WindowContent::Top) ? stateHN.idsTop :
+                        (window.content == UI::WindowContent::Show) ? stateHN.idsShow :
+                        (window.content == UI::WindowContent::New) ? stateHN.idsNew :
+                        stateHN.idsTop;
 
                     int nShow = std::min(stateUI.maxStories, (int) storyIds.size());
                     for (int i = 0; i < nShow; ++i) {
                         const auto & id = storyIds[i];
 
-                        toRefreshFG.push_back(id);
+                        toRefresh.push_back(id);
                         if (items.find(id) == items.end() || std::holds_alternative<HN::Story>(items.at(id).data) == false) {
                             continue;
                         }
@@ -924,7 +760,7 @@ extern "C" {
                 } else {
                     const auto & story = std::get<HN::Story>(items.at(window.selectedStoryId).data);
 
-                    toRefreshFG.push_back(story.id);
+                    toRefresh.push_back(story.id);
 
                     ImGui::Text("%s", story.title.c_str());
                     ImGui::TextDisabled("%d points by %s %s ago | %d comments", story.score, story.by.c_str(), ::timeSince(story.time).c_str(), story.descendants);
@@ -944,7 +780,7 @@ extern "C" {
                         for (int i = 0; i < nComments; ++i) {
                             const auto & id = commentIds[i];
 
-                            toRefreshFG.push_back(commentIds[i]);
+                            toRefresh.push_back(commentIds[i]);
                             if (items.find(id) == items.end() || std::holds_alternative<HN::Comment>(items.at(id).data) == false) {
                                 continue;
                             }
@@ -1078,12 +914,9 @@ extern "C" {
                              ImGuiWindowFlags_NoCollapse |
                              ImGuiWindowFlags_NoResize |
                              ImGuiWindowFlags_NoMove);
-                {
-                    std::lock_guard<std::mutex> lock(g_mutex);
-                    ImGui::Text(" API requests     : %d / %d B (next update in %d s)", g_nfetches, (int) g_totalBytesDownloaded, g_nextUpdate);
-                    ImGui::Text(" Last API request : %s", g_curURI);
-                    ImGui::Text(" Source code      : https://github.com/ggerganov/imtui/tree/master/examples/hnterm");
-                }
+                ImGui::Text(" API requests     : %d / %d B (next update in %d s)", g_nfetches, (int) g_totalBytesDownloaded, g_nextUpdate);
+                ImGui::Text(" Last API request : %s", g_curURI);
+                ImGui::Text(" Source code      : https://github.com/ggerganov/imtui/tree/master/examples/hnterm");
                 ImGui::End();
             }
 
@@ -1104,10 +937,7 @@ extern "C" {
             }
 
             if (ImGui::IsKeyPressed('Q', false)) {
-#ifndef __EMSCRIPTEN__
-                g_keepRunning = false;
                 return false;
-#endif
             }
 
             stateUI.hoveredWindowId = std::min(stateUI.nWindows - 1, stateUI.hoveredWindowId);
@@ -1172,11 +1002,6 @@ extern "C" {
             vsync.wait();
 #endif
 
-            {
-                std::lock_guard<std::mutex> lock(mutex);
-                toRefreshBuf = toRefreshFG;
-            }
-
             return true;
         }
 }
@@ -1187,8 +1012,8 @@ int main(int argc, char ** argv) {
     int mouseSupport = argm.find("--mouse") != argm.end() || argm.find("m") != argm.end();
     if (argm.find("--help") != argm.end() || argm.find("-h") != argm.end()) {
         printf("Usage: %s [-m] [-h]\n", argv[0]);
-        printf("    -m,--mouse : ncurses mouse support\n");
-        printf("    -h,--help  : print this help\n");
+        printf("    -m, --mouse : ncurses mouse support\n");
+        printf("    -h, --help  : print this help\n");
         return -1;
     }
 #endif
@@ -1197,15 +1022,6 @@ int main(int argc, char ** argv) {
         fprintf(stderr, "Failed to initialize. Aborting\n");
         return -1;
     }
-
-#ifndef __EMSCRIPTEN__
-    workerHN = std::thread([&]() {
-        while (g_keepRunning) {
-            updateHN();
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-    });
-#endif
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -1239,11 +1055,9 @@ int main(int argc, char ** argv) {
     ImTui_ImplEmscripten_Shutdown();
 #else
     ImTui_ImplNcurses_Shutdown();
-
-    workerHN.join();
+#endif
 
     hnFree();
-#endif
 
     return 0;
 }

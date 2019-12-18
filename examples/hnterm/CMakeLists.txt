@@ -33,7 +33,6 @@ else()
         imtui-ncurses
         imtui-examples-common
         ${CURL_LIBRARIES}
-        ${CMAKE_THREAD_LIBS_INIT}
         )
 endif()
 
