@@ -529,11 +529,11 @@ struct WindowData {
     HN::ItemId selectedStoryId = 0;
     int hoveredStoryId = 0;
     int hoveredCommentId = 0;
+    int maxStories = 10;
 };
 
 struct State {
     int hoveredWindowId = 0;
-    int maxStories = 10;
 
     int statusWindowHeight = 4;
 #ifdef __EMSCRIPTEN__
@@ -552,17 +552,17 @@ struct State {
         {
             WindowContent::Top,
             false,
-            0, 0, 0,
+            0, 0, 0, 10,
         },
         {
             WindowContent::Show,
             false,
-            0, 0, 0,
+            0, 0, 0, 10,
         },
         {
             WindowContent::New,
             false,
-            0, 0, 0,
+            0, 0, 0, 10,
         },
     } };
 };
@@ -662,7 +662,7 @@ extern "C" {
                         (window.content == UI::WindowContent::New) ? stateHN.idsNew :
                         stateHN.idsTop;
 
-                    int nShow = std::min(stateUI.maxStories, (int) storyIds.size());
+                    int nShow = std::min(window.maxStories, (int) storyIds.size());
                     for (int i = 0; i < nShow; ++i) {
                         const auto & id = storyIds[i];
 
@@ -717,10 +717,10 @@ extern "C" {
                         }
 
                         if (ImGui::GetCursorScreenPos().y > ImGui::GetWindowSize().y) {
-                            stateUI.maxStories = i;
+                            window.maxStories = i;
                         } else {
-                            if ((i == stateUI.maxStories - 1) && (ImGui::GetCursorScreenPos().y + 2 < ImGui::GetWindowSize().y)) {
-                                ++stateUI.maxStories;
+                            if ((i == window.maxStories - 1) && (ImGui::GetCursorScreenPos().y + 2 < ImGui::GetWindowSize().y)) {
+                                ++window.maxStories;
                             }
                         }
                     }
@@ -741,7 +741,7 @@ extern "C" {
 
                         if (ImGui::IsKeyPressed('j', true) ||
                             ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_DownArrow], true)) {
-                            window.hoveredStoryId = std::min(stateUI.maxStories - 1, window.hoveredStoryId + 1);
+                            window.hoveredStoryId = std::min(window.maxStories - 1, window.hoveredStoryId + 1);
                         }
 
                         if (ImGui::IsKeyPressed('g', true)) {
@@ -749,7 +749,7 @@ extern "C" {
                         }
 
                         if (ImGui::IsKeyPressed('G', true)) {
-                            window.hoveredStoryId = stateUI.maxStories - 1;
+                            window.hoveredStoryId = window.maxStories - 1;
                         }
 
                         if (ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Tab])) {
