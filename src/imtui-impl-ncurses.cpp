@@ -9,6 +9,7 @@
 #include <ncurses.h>
 
 #include <map>
+#include <vector>
 #include <string>
 
 bool ImTui_ImplNcurses_Init(bool mouseSupport) {
@@ -63,19 +64,12 @@ void ImTui_ImplNcurses_Shutdown() {
     endwin();
 }
 
-void ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen) {
+void ImTui_ImplNcurses_NewFrame() {
 	int screenSizeX = 0;
 	int screenSizeY = 0;
 
 	getmaxyx(stdscr, screenSizeY, screenSizeX);
 	ImGui::GetIO().DisplaySize = ImVec2(screenSizeX, screenSizeY);
-
-    screen.data.resize(ImGui::GetIO().DisplaySize.y);
-    for (auto & row : screen.data) {
-        row.clear();
-        row.shrink_to_fit();
-        row.resize(ImGui::GetIO().DisplaySize.x);
-    }
 
     static int mx = 0;
     static int my = 0;
@@ -140,12 +134,12 @@ void ImTui_ImplNcurses_NewFrame(ImTui::TScreen & screen) {
     ImGui::GetIO().MouseDown[1] = rbut;
 }
 
-void ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen) {
+void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen) {
     int np = 1;
-    std::map<int, int> pairs;
+    std::map<uint16_t, uint16_t> pairs;
 
-    int nx = screen.data[0].size();
-    int ny = screen.data.size();
+    int nx = screen.nx;
+    int ny = screen.ny;
 
     int ic = 0;
     std::vector<uint8_t> curs(nx + 1);
@@ -154,9 +148,10 @@ void ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen) {
         int lastp = -1;
         move(y, 0);
         for (int x = 0; x < nx; ++x) {
-            int f = screen.data[y][x].f;
-            int b = screen.data[y][x].b;
-            int p = b*256 + f;
+            auto cell = screen.data[y*nx + x];
+            uint16_t f = (cell & 0x00FF0000) >> 16;
+            uint16_t b = (cell & 0xFF000000) >> 24;
+            uint16_t p = b*256 + f;
 
             if (pairs.find(p) == pairs.end()) {
                 pairs[p] = np;
@@ -174,7 +169,9 @@ void ImTui_ImplNcurses_DrawScreen(ImTui::TScreen & screen) {
                 attron(COLOR_PAIR(pairs[p]));
                 lastp = pairs[p];
             }
-            curs[ic++] = screen.data[y][x].c > 0 ? screen.data[y][x].c : '.';
+
+            uint16_t c = cell & 0x0000FFFF;
+            curs[ic++] = c > 0 ? c : '.';
         }
 
         if (curs.size() > 0) {

@@ -20,7 +20,7 @@ int main() {
     float fval = 1.23f;
 
     while (true) {
-        ImTui_ImplNcurses_NewFrame(screen);
+        ImTui_ImplNcurses_NewFrame();
         ImTui_ImplText_NewFrame();
 
         ImGui::GetIO().DeltaTime = vsync.delta_s();

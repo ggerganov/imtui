@@ -9,21 +9,46 @@
 
 #include "imtui/imtui-impl-text.h"
 
-#include <vector>
+#include <cstring>
+#include <cstdint>
 
 namespace ImTui {
 
 using TChar = unsigned char;
 using TColor = unsigned char;
 
-struct TCell {
-    TChar c;
-    TColor f = 0;
-    TColor b = 0;
-};
+// single screen cell
+// 0x0000FFFF - char
+// 0x00FF0000 - foreground color
+// 0xFF000000 - background color
+using TCell = uint32_t;
 
 struct TScreen {
-    std::vector<std::vector<TCell>> data;
+    int nx = 0;
+    int ny = 0;
+
+    int nmax = 0;
+
+    TCell * data = nullptr;
+
+    inline int size() const { return nx*ny; }
+
+    inline void clear() {
+        if (data) {
+            memset(data, 0, nx*ny*sizeof(TCell));
+        }
+    }
+
+    inline void resize(int pnx, int pny) {
+        nx = pnx;
+        ny = pny;
+        if (nx*ny <= nmax) return;
+
+        if (data) delete [] data;
+
+        nmax = nx*ny;
+        data = new TCell[nmax];
+    }
 };
 
 }

@@ -10,7 +10,7 @@ struct TScreen;
 
 bool ImTui_ImplEmscripten_Init(bool mouseSupport);
 void ImTui_ImplEmscripten_Shutdown();
-void ImTui_ImplEmscripten_NewFrame(ImTui::TScreen & screen);
+void ImTui_ImplEmscripten_NewFrame();
 
 extern "C" {
     void set_mouse_pos(float x, float y);

@@ -52,7 +52,7 @@ bool ImTui_ImplEmscripten_Init(bool mouseSupport) {
 void ImTui_ImplEmscripten_Shutdown() {
 }
 
-void ImTui_ImplEmscripten_NewFrame(ImTui::TScreen & screen) {
+void ImTui_ImplEmscripten_NewFrame() {
     ImGui::GetIO().MousePos = lastMousePos;
     ImGui::GetIO().MouseWheelH = lastMouseWheelH;
     ImGui::GetIO().MouseWheel = lastMouseWheel;
@@ -73,14 +73,6 @@ void ImTui_ImplEmscripten_NewFrame(ImTui::TScreen & screen) {
     lastMouseWheelH = 0.0;
     lastMouseWheel = 0.0;
     lastAddText = "";
-
-    for (auto & row : screen.data) {
-        for (auto & cell : row) {
-            cell.c = ' ';
-            cell.f = 0;
-            cell.b = 0;
-        }
-    }
 }
 
 EMSCRIPTEN_KEEPALIVE

@@ -10,6 +10,7 @@
 #include "imtui/imtui-impl-text.h"
 
 #include <cmath>
+#include <vector>
 
 #define ABS(x) ((x >= 0) ? x : -x)
 
@@ -71,7 +72,7 @@ void ScanLine(int x1, int y1, int x2, int y2, int ymax, std::vector<int> & xrang
 }
 
 void drawTriangle(ImVec2 p0, ImVec2 p1, ImVec2 p2, unsigned char col, ImTui::TScreen & screen) {
-    int ymin = std::min(std::min(std::min((float) screen.data.size(), p0.y), p1.y), p2.y);
+    int ymin = std::min(std::min(std::min((float) screen.size(), p0.y), p1.y), p2.y);
     int ymax = std::max(std::max(std::max(0.0f, p0.y), p1.y), p2.y);
 
     int ydelta = ymax - ymin + 1;
@@ -93,9 +94,11 @@ void drawTriangle(ImVec2 p0, ImVec2 p1, ImVec2 p2, unsigned char col, ImTui::TSc
             int len = 1 + xrange[2*y+1] - xrange[2*y+0];
 
             while (len--) {
-                if (x >= 0 && x < (int) screen.data[0].size() && y + ymin >= 0 && y + ymin < (int) screen.data.size()) {
-                    screen.data[y + ymin][x].c = ' ';
-                    screen.data[y + ymin][x].b = col;
+                if (x >= 0 && x < screen.nx && y + ymin >= 0 && y + ymin < screen.ny) {
+                    auto & cell = screen.data[(y + ymin)*screen.nx + x];
+                    cell &= 0x00FF0000;
+                    cell |= ' ';
+                    cell |= ((ImTui::TCell)(col) << 24);
                 }
                 ++x;
             }
@@ -103,7 +106,7 @@ void drawTriangle(ImVec2 p0, ImVec2 p1, ImVec2 p2, unsigned char col, ImTui::TSc
     }
 }
 
-ImTui::TColor rgbToAnsi256(ImU32 col, bool doAlpha) {
+inline ImTui::TColor rgbToAnsi256(ImU32 col, bool doAlpha) {
     ImTui::TColor r = col & 0x000000FF;
     ImTui::TColor g = (col & 0x0000FF00) >> 8;
     ImTui::TColor b = (col & 0x00FF0000) >> 16;
@@ -143,10 +146,8 @@ void ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & scree
     if (fb_width <= 0 || fb_height <= 0)
         return;
 
-    screen.data.resize(ImGui::GetIO().DisplaySize.y);
-    for (auto & row : screen.data) {
-        row.resize(ImGui::GetIO().DisplaySize.x);
-    }
+    screen.resize(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
+    screen.clear();
 
     // Will project scissor/clipping rectangles into framebuffer space
     ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
@@ -220,8 +221,10 @@ void ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & scree
                             int yy = (y) + 0;
                             if (xx < clip_rect.x || xx >= clip_rect.z || yy < clip_rect.y || yy >= clip_rect.w) {
                             } else {
-                                screen.data[yy][xx].c = (col0 & 0xff000000) >> 24;
-                                screen.data[yy][xx].f = rgbToAnsi256(col0, false);
+                                auto & cell = screen.data[yy*screen.nx + xx];
+                                cell &= 0xFF000000;
+                                cell |= (col0 & 0xff000000) >> 24;
+                                cell |= ((ImTui::TCell)(rgbToAnsi256(col0, false)) << 16);
                             }
                             i += 3;
                         } else {

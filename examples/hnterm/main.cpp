@@ -654,17 +654,19 @@ HN::ItemIds toRefresh;
 UI::State stateUI;
 
 extern "C" {
+#ifdef __EMSCRIPTEN__
     EMSCRIPTEN_KEEPALIVE
         void get_screen(char * buffer) {
-            int nx = screen.data[0].size();
-            int ny = screen.data.size();
+            int nx = screen.nx;
+            int ny = screen.ny;
 
             int idx = 0;
             for (int y = 0; y < ny; ++y) {
                 for (int x = 0; x < nx; ++x) {
-                    buffer[idx] = screen.data[y][x].c; ++idx;
-                    buffer[idx] = screen.data[y][x].f; ++idx;
-                    buffer[idx] = screen.data[y][x].b; ++idx;
+                    const auto & cell = screen.data[y*nx + x];
+                    buffer[idx] = cell & 0x000000FF; ++idx;
+                    buffer[idx] = (cell & 0x00FF0000) >> 16; ++idx;
+                    buffer[idx] = (cell & 0xFF000000) >> 24; ++idx;
                 }
             }
         }
@@ -674,6 +676,7 @@ extern "C" {
             ImGui::GetIO().DisplaySize.x = nx;
             ImGui::GetIO().DisplaySize.y = ny;
         }
+#endif
 
     EMSCRIPTEN_KEEPALIVE
         bool render_frame() {
@@ -683,9 +686,9 @@ extern "C" {
             toRefresh.clear();
 
 #ifdef __EMSCRIPTEN__
-            ImTui_ImplEmscripten_NewFrame(screen);
+            ImTui_ImplEmscripten_NewFrame();
 #else
-            ImTui_ImplNcurses_NewFrame(screen);
+            ImTui_ImplNcurses_NewFrame();
 #endif
             ImTui_ImplText_NewFrame();
 
