@@ -12,7 +12,7 @@
     <body>
 
         <div>
-        <pre id="screen" class="no-sel" contenteditable="true" unselectable="on" autocomplete='off' spellcheck='false' autocorrect='off'></pre>
+            <pre id="screen" class="no-sel" contenteditable="true" unselectable="on" autocomplete='off' spellcheck='false' autocorrect='off'><span id="single-char"> </span></pre>
         </div>
 
         <div class="cell-about">
@@ -26,10 +26,8 @@
             var screenX = 200;
             var screenY = 60;
 
-            var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-
-            var charSizeX = isFirefox ? 8.0 : 7.8;
-            var charSizeY = isFirefox ? 17.0 : 15.0;
+            var charSizeX = document.getElementById('single-char').getBoundingClientRect().width;
+            var charSizeY = document.getElementById('single-char').getBoundingClientRect().height;
 
             function onkeyup(event) {
                 Module._set_key_up(event.keyCode);
@@ -159,7 +157,7 @@
 
                 Module._set_screen_size(screenX, screenY);
 
-                window.requestAnimationFrame(test);
+                window.requestAnimationFrame(renderFrame);
             }
 
             var Module = {
@@ -193,7 +191,7 @@
 
             var oldRow = {};
 
-            function test() {
+            function renderFrame() {
                 if (bufferScreen == null) {
                     bufferScreen = Module._malloc(3*512*128);
                 }
@@ -214,7 +212,7 @@
                     }
                     Module._set_screen_size(screenX, screenY);
 
-                    window.requestAnimationFrame(test);
+                    window.requestAnimationFrame(renderFrame);
                     return;
                 }
 
@@ -251,7 +249,7 @@
                     }
                 }
 
-                window.requestAnimationFrame(test);
+                window.requestAnimationFrame(renderFrame);
             }
 
         </script>
