@@ -23,8 +23,8 @@
 
         <script type='text/javascript'>
 
-            var screenX = 200;
-            var screenY = 60;
+            var screenX = -1;
+            var screenY = -1;
 
             var charSizeX = document.getElementById('single-char').getBoundingClientRect().width;
             var charSizeY = document.getElementById('single-char').getBoundingClientRect().height;
@@ -155,8 +155,6 @@
                 screen.addEventListener('touchend', ontouch);
                 screen.addEventListener('touchcancel', ontouch);
 
-                Module._set_screen_size(screenX, screenY);
-
                 window.requestAnimationFrame(renderFrame);
             }
 
@@ -188,15 +186,11 @@
             };
 
             var bufferScreen = null;
+            var bufferScreenMax = 0;
 
             var oldRow = {};
 
             function renderFrame() {
-                if (bufferScreen == null) {
-                    bufferScreen = Module._malloc(3*512*128);
-                }
-                Module._render_frame();
-                Module._get_screen(bufferScreen);
 
                 var screen = document.getElementById('screen');
 
@@ -204,17 +198,32 @@
                 var screenYNew = Math.floor(window.innerHeight/charSizeY - 2);
 
                 if (screenXNew != screenX || screenYNew != screenY) {
+                    if (screenYNew != screenY) {
+                        oldRow = {}
+                    }
+
                     screenX = screenXNew;
                     screenY = screenYNew;
+
                     screen.innerHTML = '';
                     for (var i = 0; i < screenY; ++i) {
                         screen.innerHTML += '<span id="r'+i+'"></span>';
                     }
+
                     Module._set_screen_size(screenX, screenY);
 
-                    window.requestAnimationFrame(renderFrame);
-                    return;
+                    if (screenX*screenY > bufferScreenMax) {
+                        if (bufferScreen != null) {
+                            Module._free(bufferScreen);
+                        }
+
+                        bufferScreen = Module._malloc(3*screenX*screenY);
+                        bufferScreenMax = screenX*screenY;
+                    }
                 }
+
+                Module._render_frame();
+                Module._get_screen(bufferScreen);
 
                 var idx = 0;
                 for (var y = 0; y < screenY; ++y) {
