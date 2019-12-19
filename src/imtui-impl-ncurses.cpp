@@ -134,18 +134,39 @@ void ImTui_ImplNcurses_NewFrame() {
     ImGui::GetIO().MouseDown[1] = rbut;
 }
 
-void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen) {
-    int np = 1;
-    std::map<uint16_t, uint16_t> pairs;
+// state
+int nColPairs = 1;
+ImTui::TScreen screenPrev;
+std::vector<uint8_t> curs;
+std::array<std::pair<bool, int>, 256*256> colPairs;
 
+void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen) {
     int nx = screen.nx;
     int ny = screen.ny;
 
+    bool compare = true;
+
+    if (screenPrev.nx != nx || screenPrev.ny != ny) {
+        screenPrev.resize(nx, ny);
+        compare = false;
+    }
+
     int ic = 0;
-    std::vector<uint8_t> curs(nx + 1);
+    curs.resize(nx + 1);
 
     for (int y = 0; y < ny; ++y) {
-        int lastp = -1;
+        bool isSame = compare;
+        if (compare) {
+            for (int x = 0; x < nx; ++x) {
+                if (screenPrev.data[y*nx + x] != screen.data[y*nx + x]) {
+                    isSame = false;
+                    break;
+                }
+            }
+        }
+        if (isSame) continue;
+
+        int lastp = 0xFFFFFFFF;
         move(y, 0);
         for (int x = 0; x < nx; ++x) {
             auto cell = screen.data[y*nx + x];
@@ -153,21 +174,22 @@ void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen) {
             uint16_t b = (cell & 0xFF000000) >> 24;
             uint16_t p = b*256 + f;
 
-            if (pairs.find(p) == pairs.end()) {
-                pairs[p] = np;
-                init_pair(np, f, b);
-                ++np;
+            if (colPairs[p].first == false) {
+                init_pair(nColPairs, f, b);
+                colPairs[p].first = true;
+                colPairs[p].second = nColPairs;
+                ++nColPairs;
             }
 
-            if (lastp != pairs[p]) {
+            if (lastp != (int) p) {
                 if (curs.size() > 0) {
                     curs[ic] = 0;
                     addstr((char *) curs.data());
                     ic = 0;
                     curs[0] = 0;
                 }
-                attron(COLOR_PAIR(pairs[p]));
-                lastp = pairs[p];
+                attron(COLOR_PAIR(colPairs[p].second));
+                lastp = p;
             }
 
             uint16_t c = cell & 0x0000FFFF;
@@ -180,6 +202,14 @@ void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen) {
             ic = 0;
             curs[0] = 0;
         }
+
+        if (compare) {
+            memcpy(screenPrev.data + y*nx, screen.data + y*nx, nx*sizeof(ImTui::TCell));
+        }
+    }
+
+    if (!compare) {
+        memcpy(screenPrev.data, screen.data, nx*ny*sizeof(ImTui::TCell));
     }
 }
 
