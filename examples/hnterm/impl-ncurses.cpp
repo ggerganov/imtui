@@ -16,9 +16,10 @@
 #include <string>
 #include <chrono>
 
-#define MAX_PARALLEL 8
+#define MAX_PARALLEL 5
 
 struct Data {
+    CURL *eh = NULL;
     bool running = false;
     std::string uri = "";
     std::string content = "";
@@ -38,16 +39,18 @@ size_t writeFunction(void *ptr, size_t size, size_t nmemb, Data* data) {
     data->content.append((char*) ptr, size * nmemb);
     g_fetchCache[data->uri] = std::move(data->content);
     data->content.clear();
-    data->running = false;
 
     return size * nmemb;
 }
 
 static void add_transfer(CURLM *cm, int idx, std::string && uri) {
-    CURL *eh = curl_easy_init();
-    curl_easy_setopt(eh, CURLOPT_WRITEFUNCTION, writeFunction);
+    if (g_fetchData[idx].eh == NULL) {
+        g_fetchData[idx].eh = curl_easy_init();
+    }
+    CURL *eh = g_fetchData[idx].eh;
     curl_easy_setopt(eh, CURLOPT_URL, uri.c_str());
-    curl_easy_setopt(eh, CURLOPT_PRIVATE, uri.c_str());
+    curl_easy_setopt(eh, CURLOPT_PRIVATE, &g_fetchData[idx]);
+    curl_easy_setopt(eh, CURLOPT_NOSIGNAL, 1);
     curl_easy_setopt(eh, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(eh, CURLOPT_WRITEDATA, &g_fetchData[idx]);
     curl_multi_add_handle(cm, eh);
@@ -97,12 +100,13 @@ void updateRequests_impl() {
 
     while ((msg = curl_multi_info_read(g_cm, &msgs_left))) {
         if (msg->msg == CURLMSG_DONE) {
-            char *url;
+            Data* data;
             CURL *e = msg->easy_handle;
-            curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &url);
-            //fprintf(stderr, "R: %d - %s <%s>\n", msg->data.result, curl_easy_strerror(msg->data.result), url);
+            curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &data);
+            data->running = false;
             curl_multi_remove_handle(g_cm, e);
-            curl_easy_cleanup(e);
+            //curl_easy_cleanup(e);
+            //data->eh = NULL;
         } else {
             fprintf(stderr, "E: CURLMsg (%d)\n", msg->msg);
         }
@@ -113,13 +117,19 @@ void updateRequests_impl() {
     curl_multi_perform(g_cm, &still_alive);
 
     while (still_alive < MAX_PARALLEL && g_fetchQueue.size() > 0) {
-        auto uri = std::move(g_fetchQueue.front());
         int idx = 0;
-        while (g_fetchData[idx].running) ++idx;
+        while (g_fetchData[idx].running) {
+            ++idx;
+            if (idx == g_fetchData.size()) break;
+        }
+        if (idx == g_fetchData.size()) break;
+
+        auto uri = std::move(g_fetchQueue.front());
         g_fetchData[idx].running = true;
         g_fetchData[idx].uri = uri;
         g_fetchQueue.pop_front();
         add_transfer(g_cm, idx, std::move(uri));
+
         ++still_alive;
     }
 }

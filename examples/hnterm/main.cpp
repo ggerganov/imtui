@@ -233,6 +233,7 @@ std::string parseHTML(std::string str) {
     ::replaceAll(res, "„", "'");
     ::replaceAll(res, "&quot;", "\"");
     ::replaceAll(res, "&amp;", "&");
+    ::replaceAll(res, "—", "-");
 
     return res;
 }
