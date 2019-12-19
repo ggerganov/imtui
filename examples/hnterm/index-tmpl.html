@@ -17,7 +17,7 @@
     <body>
 
         <div>
-        <pre id="screen" class="no-sel" contenteditable="true" unselectable="on" autocomplete='off' spellcheck='false' autocorrect='off'></pre>
+            <pre id="screen" class="no-sel" contenteditable="true" unselectable="on" autocomplete='off' spellcheck='false' autocorrect='off'><span id="single-char"> </span></pre>
         </div>
 
         <div class="cell-about">
@@ -35,13 +35,11 @@
 
             var isMobile = mobilecheck();
 
-            var screenX = 200;
-            var screenY = 60;
+            var screenX = -1;
+            var screenY = -1;
 
-            var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-
-            var charSizeX = isFirefox ? 8.0 : 7.8;
-            var charSizeY = isFirefox ? 17.0 : 15.0;
+            var charSizeX = document.getElementById('single-char').getBoundingClientRect().width;
+            var charSizeY = document.getElementById('single-char').getBoundingClientRect().height;
 
             function onkeyup(event) {
                 Module._set_key_up(event.keyCode);
@@ -174,9 +172,7 @@
                 screen.addEventListener('touchend', ontouch);
                 screen.addEventListener('touchcancel', ontouch);
 
-                Module._set_screen_size(screenX, screenY);
-
-                window.requestAnimationFrame(test);
+                window.requestAnimationFrame(renderFrame);
             }
 
             var Module = {
@@ -207,33 +203,43 @@
             };
 
             var bufferScreen = null;
+            var bufferScreenMax = 0;
 
             var oldRow = {};
 
-            function test() {
-                if (bufferScreen == null) {
-                    bufferScreen = Module._malloc(3*512*128);
-                }
-                Module._render_frame();
-                Module._get_screen(bufferScreen);
-
+            function renderFrame() {
                 var screen = document.getElementById('screen');
 
                 var screenXNew = Math.floor(window.innerWidth/charSizeX - 2);
                 var screenYNew = Math.floor(window.innerHeight/charSizeY - 2);
 
                 if (screenXNew != screenX || screenYNew != screenY) {
+                    if (screenYNew != screenY) {
+                        oldRow = {}
+                    }
+
                     screenX = screenXNew;
                     screenY = screenYNew;
+
                     screen.innerHTML = '';
                     for (var i = 0; i < screenY; ++i) {
                         screen.innerHTML += '<span id="r'+i+'"></span>';
                     }
+
                     Module._set_screen_size(screenX, screenY);
 
-                    window.requestAnimationFrame(test);
-                    return;
+                    if (screenX*screenY > bufferScreenMax) {
+                        if (bufferScreen != null) {
+                            Module._free(bufferScreen);
+                        }
+
+                        bufferScreen = Module._malloc(3*screenX*screenY);
+                        bufferScreenMax = screenX*screenY;
+                    }
                 }
+
+                Module._render_frame();
+                Module._get_screen(bufferScreen);
 
                 var idx = 0;
                 for (var y = 0; y < screenY; ++y) {
@@ -268,7 +274,7 @@
                     }
                 }
 
-                window.requestAnimationFrame(test);
+                window.requestAnimationFrame(renderFrame);
             }
 
         </script>
