@@ -21,16 +21,24 @@ body {
 .cell {
     pointer-events: none;
 }
+.cell-version {
+    padding-left: 4px;
+    padding-top: 0.5em;
+    text-align: left;
+    display: inline-block;
+    float: left;
+    color: rgba(255, 255, 255, 0.75);
+}
 .cell-about {
-    padding-right: 8px;
+    padding-right: 24px;
     padding-top: 0.5em;
     text-align: right;
     display: inline-block;
-    float:right;
+    float: right;
 }
 .nav-link {
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 1.0);
 }
 svg {
     -webkit-filter: invert(100%); /* safari 6.0 - 9.0 */
