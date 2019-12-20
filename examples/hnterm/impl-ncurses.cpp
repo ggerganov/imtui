@@ -7,11 +7,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <signal.h>
 #ifndef WIN32
 #include <unistd.h>
 #endif
 #include <curl/curl.h>
-#include <openssl/err.h>
 
 #include <map>
 #include <array>
@@ -21,64 +21,13 @@
 
 #define MAX_PARALLEL 5
 
-#define MUTEX_TYPE       pthread_mutex_t
-#define MUTEX_SETUP(x)   pthread_mutex_init(&(x), NULL)
-#define MUTEX_CLEANUP(x) pthread_mutex_destroy(&(x))
-#define MUTEX_LOCK(x)    pthread_mutex_lock(&(x))
-#define MUTEX_UNLOCK(x)  pthread_mutex_unlock(&(x))
-#define THREAD_ID        pthread_self()
-
-static void handle_error(const char *file, int lineno, const char *msg) {
-    fprintf(stderr, "** %s:%d %s\n", file, lineno, msg);
-    //ERR_print_errors_fp(stderr);
-    /* exit(-1); */
+#include <fstream>
+void sigpipe_handler(int signal) {
+    std::ofstream fout("SIGPIPE.OCCURED");
+    fout << signal << std::endl;
+    fout.close();
 }
 
-/* This array will store all of the mutexes available to OpenSSL. */
-static MUTEX_TYPE *mutex_buf = NULL;
-
-static void locking_function(int mode, int n, const char *file, int line) {
-    if(mode & CRYPTO_LOCK) {
-        MUTEX_LOCK(mutex_buf[n]);
-    } else {
-        MUTEX_UNLOCK(mutex_buf[n]);
-    }
-}
-
-static unsigned long id_function(void) {
-    return ((unsigned long)THREAD_ID);
-}
-
-int thread_setup(void) {
-    int i;
-
-    mutex_buf = (MUTEX_TYPE *) malloc(CRYPTO_num_locks() * sizeof(MUTEX_TYPE));
-    if (!mutex_buf) {
-        return 0;
-    }
-    for (i = 0; i < CRYPTO_num_locks(); i++) {
-        MUTEX_SETUP(mutex_buf[i]);
-    }
-    CRYPTO_set_id_callback(id_function);
-    CRYPTO_set_locking_callback(locking_function);
-    return 1;
-}
-
-int thread_cleanup(void) {
-    int i;
-
-    if (!mutex_buf) {
-        return 0;
-    }
-    CRYPTO_set_id_callback(NULL);
-    CRYPTO_set_locking_callback(NULL);
-    for (i = 0; i < CRYPTO_num_locks(); i++) {
-        MUTEX_CLEANUP(mutex_buf[i]);
-    }
-    free(mutex_buf);
-    mutex_buf = NULL;
-    return 1;
-}
 
 struct Data {
     CURL *eh = NULL;
@@ -112,14 +61,25 @@ static void add_transfer(CURLM *cm, int idx, std::string && uri) {
     CURL *eh = g_fetchData[idx].eh;
     curl_easy_setopt(eh, CURLOPT_URL, uri.c_str());
     curl_easy_setopt(eh, CURLOPT_PRIVATE, &g_fetchData[idx]);
-    curl_easy_setopt(eh, CURLOPT_NOSIGNAL, 1);
     curl_easy_setopt(eh, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(eh, CURLOPT_WRITEDATA, &g_fetchData[idx]);
     curl_multi_add_handle(cm, eh);
 }
 
 bool hnInit() {
-    thread_setup();
+    struct sigaction sh;
+    struct sigaction osh;
+
+    sh.sa_handler = &sigpipe_handler; //Can set to SIG_IGN
+    // Restart interrupted system calls
+    sh.sa_flags = SA_RESTART;
+
+    // Block every signal during the handler
+    sigemptyset(&sh.sa_mask);
+
+    if (sigaction(SIGPIPE, &sh, &osh) < 0) {
+        return false;
+    }
 
     curl_global_init(CURL_GLOBAL_ALL);
     g_cm = curl_multi_init();
@@ -132,8 +92,6 @@ bool hnInit() {
 void hnFree() {
     curl_multi_cleanup(g_cm);
     curl_global_cleanup();
-
-    thread_cleanup();
 }
 
 int openInBrowser(std::string uri) {
