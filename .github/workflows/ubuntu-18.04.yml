@@ -1,0 +1,18 @@
+name: Ubuntu-18.04-GCC
+on: [push]
+jobs:
+
+gcc:
+    runs-on: ubuntu-18.04
+    strategy:
+        matrix:
+            build: [Debug, Release]
+            steps:
+                - name: Clone
+                  uses: actions/checkout@v1
+                  with:
+                      submodules: true
+                - name: Configure
+                  run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.build }}
+                - name: Build
+                  run: make
