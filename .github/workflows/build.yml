@@ -2,7 +2,7 @@ name: CI
 on: [push]
 
 jobs:
-    ubuntu-18.04-gcc:
+    ubuntu-18_04-gcc:
         runs-on: ubuntu-18.04
 
         strategy:
@@ -24,7 +24,7 @@ jobs:
             - name: Build
               run: make
 
-    ubuntu-18.04-clang:
+    ubuntu-18_04-clang:
         runs-on: ubuntu-18.04
 
         strategy:
@@ -46,7 +46,7 @@ jobs:
             - name: Build
               run: make
 
-    macOS-10.14-clang:
+    macOS-10_14-clang:
         runs-on: macOS-10.14
 
         strategy:
