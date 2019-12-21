@@ -8,6 +8,7 @@
 
 #include <ncurses.h>
 
+#include <array>
 #include <map>
 #include <vector>
 #include <string>
