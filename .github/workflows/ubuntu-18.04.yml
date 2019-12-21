@@ -12,6 +12,8 @@ jobs:
               uses: actions/checkout@v1
               with:
                   submodules: true
+            - name: Dependencies
+              run: sudo apt-get install libncurses5-dev
             - name: Configure
               run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.build }}
             - name: Build
