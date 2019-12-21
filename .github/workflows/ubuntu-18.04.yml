@@ -7,12 +7,12 @@ gcc:
     strategy:
         matrix:
             build: [Debug, Release]
-            steps:
-                - name: Clone
-                  uses: actions/checkout@v1
-                  with:
-                      submodules: true
-                - name: Configure
-                  run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.build }}
-                - name: Build
-                  run: make
+    steps:
+        - name: Clone
+          uses: actions/checkout@v1
+          with:
+              submodules: true
+        - name: Configure
+          run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.build }}
+        - name: Build
+          run: make
