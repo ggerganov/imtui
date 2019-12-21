@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Ubuntu
 
 on: [push]
 
@@ -6,14 +6,12 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v1
-    - name: configure
-      run: ./configure
+    - name: setup
+      run: mkdir build && cd build
+    - name: cmake
+      run: cmake ..
     - name: make
       run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
