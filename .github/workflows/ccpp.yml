@@ -9,6 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: checkout submodules
+      uses: srt32/git-actions@v0.0.3
+      args: git submodule update --init --recursive
     - name: setup
       run: mkdir build && cd build
     - name: cmake
