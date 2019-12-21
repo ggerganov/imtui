@@ -1,11 +1,3 @@
-if (IMTUI_ALL_WARNINGS)
-    if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
-    else()
-        # todo : windows
-    endif()
-endif()
-
 # core
 
 add_library(imtui-core ${IMTUI_LIBRARY_TYPE}

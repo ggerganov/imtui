@@ -21,11 +21,18 @@
 
 #define MAX_PARALLEL 5
 
+//#define DEBUG_SIGPIPE
+
+#ifdef DEBUG_SIGPIPE
 #include <fstream>
-void sigpipe_handler(int signal) {
+#endif
+
+void sigpipe_handler([[maybe_unused]] int signal) {
+#ifdef DEBUG_SIGPIPE
     std::ofstream fout("SIGPIPE.OCCURED");
     fout << signal << std::endl;
     fout.close();
+#endif
 }
 
 
