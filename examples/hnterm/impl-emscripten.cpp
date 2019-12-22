@@ -9,6 +9,9 @@
 #include <mutex>
 #include <string>
 
+static int g_nFetches;
+static uint64_t g_totalBytesDownloaded = 0;
+
 // not sure if this mutex is needed, but just in case
 static std::mutex g_mutex;
 static std::map<std::string, std::string> g_fetchCache;
@@ -32,6 +35,8 @@ int openInBrowser(std::string uri) {
 }
 
 void downloadSucceeded(emscripten_fetch_t *fetch) {
+    g_totalBytesDownloaded += fetch->numBytes;
+
     //printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
     {
         std::lock_guard<std::mutex> lock(g_mutex);
@@ -56,7 +61,17 @@ std::string getJSONForURI_impl(const std::string & uri) {
     return "";
 }
 
+uint64_t getTotalBytesDownloaded() {
+    return g_totalBytesDownloaded;
+}
+
+uint64_t getNFetches() {
+    return g_nFetches;
+}
+
 void requestJSONForURI_impl(std::string uri) {
+    ++g_nFetches;
+
     emscripten_fetch_attr_t attr;
     emscripten_fetch_attr_init(&attr);
     strcpy(attr.requestMethod, "GET");

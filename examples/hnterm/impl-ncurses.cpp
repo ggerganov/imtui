@@ -23,9 +23,27 @@
 
 //#define DEBUG_SIGPIPE
 
-#ifdef DEBUG_SIGPIPE
+#if defined(DEBUG_SIGPIPE) || defined(ENABLE_API_CACHE)
 #include <fstream>
 #endif
+
+namespace {
+#ifdef ENABLE_API_CACHE
+    inline std::string getCacheFname(const std::string & uri) {
+        std::string fname = "cache-" + uri;
+        for (auto & ch : fname) {
+            if ((ch >= 'a' && ch <= 'z') ||
+                (ch >= 'A' && ch <= 'Z') ||
+                (ch >= '0' && ch <= '9')) {
+                continue;
+            }
+            ch = '-';
+        }
+
+        return fname;
+    }
+#endif
+}
 
 void sigpipe_handler([[maybe_unused]] int signal) {
 #ifdef DEBUG_SIGPIPE
@@ -34,7 +52,6 @@ void sigpipe_handler([[maybe_unused]] int signal) {
     fout.close();
 #endif
 }
-
 
 struct Data {
     CURL *eh = NULL;
@@ -45,6 +62,8 @@ struct Data {
 
 static CURLM *g_cm;
 
+static int g_nFetches = 0;
+static uint64_t g_totalBytesDownloaded = 0;
 static std::deque<std::string> g_fetchQueue;
 static std::map<std::string, std::string> g_fetchCache;
 static std::array<Data, MAX_PARALLEL> g_fetchData;
@@ -53,15 +72,26 @@ uint64_t t_s() {
     return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); // duh ..
 }
 
-size_t writeFunction(void *ptr, size_t size, size_t nmemb, Data* data) {
-    data->content.append((char*) ptr, size * nmemb);
+static size_t writeFunction(void *ptr, size_t size, size_t nmemb, Data* data) {
+    g_totalBytesDownloaded += size*nmemb;
+
+    data->content.append((char*) ptr, size*nmemb);
+
+#ifdef ENABLE_API_CACHE
+    auto fname = ::getCacheFname(data->uri);
+
+    std::ofstream fout(fname);
+    fout.write(data->content.c_str(), data->content.size());
+    fout.close();
+#endif
+
     g_fetchCache[data->uri] = std::move(data->content);
     data->content.clear();
 
     return size * nmemb;
 }
 
-static void add_transfer(CURLM *cm, int idx, std::string && uri) {
+static void addTransfer(CURLM *cm, int idx, std::string && uri) {
     if (g_fetchData[idx].eh == NULL) {
         g_fetchData[idx].eh = curl_easy_init();
     }
@@ -121,6 +151,14 @@ std::string getJSONForURI_impl(const std::string & uri) {
     return "";
 }
 
+uint64_t getTotalBytesDownloaded() {
+    return g_totalBytesDownloaded;
+}
+
+uint64_t getNFetches() {
+    return g_nFetches;
+}
+
 void requestJSONForURI_impl(std::string uri) {
     g_fetchQueue.push_back(std::move(uri));
 }
@@ -156,10 +194,27 @@ void updateRequests_impl() {
         if (idx == g_fetchData.size()) break;
 
         auto uri = std::move(g_fetchQueue.front());
+        g_fetchQueue.pop_front();
+
+#ifdef ENABLE_API_CACHE
+        auto fname = ::getCacheFname(uri);
+
+        std::ifstream fin(fname);
+        if (fin.is_open() && fin.good()) {
+            std::string str((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
+            fin.close();
+
+            g_fetchCache[uri] = std::move(str);
+
+            continue;
+        }
+#endif
+
+        ++g_nFetches;
+
         g_fetchData[idx].running = true;
         g_fetchData[idx].uri = uri;
-        g_fetchQueue.pop_front();
-        add_transfer(g_cm, idx, std::move(uri));
+        addTransfer(g_cm, idx, std::move(uri));
 
         ++still_alive;
     }

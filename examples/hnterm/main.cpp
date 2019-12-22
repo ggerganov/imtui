@@ -9,8 +9,6 @@
 
 #ifdef __EMSCRIPTEN__
 
-#define ENABLE_API_CACHE 0
-
 #include "imtui/imtui-impl-emscripten.h"
 
 #include <emscripten.h>
@@ -18,7 +16,6 @@
 
 #else
 
-#define ENABLE_API_CACHE 0
 #define EMSCRIPTEN_KEEPALIVE
 
 #include "imtui/imtui-impl-ncurses.h"
@@ -31,14 +28,9 @@
 #include <variant>
 #include <functional>
 
-// tmp
-#include <fstream>
-
 // global vars
 char g_curURI[512];
-int g_nfetches = 0;
 int g_nextUpdate = 0;
-uint64_t g_totalBytesDownloaded = 0;
 
 // screen buffer
 ImTui::TScreen screen;
@@ -49,6 +41,8 @@ extern void hnFree();
 extern int openInBrowser(std::string uri);
 extern void requestJSONForURI_impl(std::string uri);
 extern std::string getJSONForURI_impl(const std::string & uri);
+extern uint64_t getTotalBytesDownloaded();
+extern int getNFetches();
 extern void updateRequests_impl();
 extern uint64_t t_s();
 
@@ -88,7 +82,6 @@ inline std::string timeSince(uint64_t t) {
 }
 
 void requestJSONForURI(std::string uri) {
-    ++g_nfetches;
     snprintf(g_curURI, 512, "%s", uri.c_str());
 
     requestJSONForURI_impl(std::move(uri));
@@ -97,36 +90,6 @@ void requestJSONForURI(std::string uri) {
 std::string getJSONForURI(const std::string & uri) {
     auto response_string = getJSONForURI_impl(uri);
     if (response_string == "") return "";
-
-#ifdef ENABLE_API_CACHE
-    std::string fname = "cache-" + uri;
-    for (auto & ch : fname) {
-        if ((ch >= 'a' && ch <= 'z') ||
-            (ch >= 'A' && ch <= 'Z') ||
-            (ch >= '0' && ch <= '9')) {
-            continue;
-        }
-        ch = '-';
-    }
-
-    //if (ENABLE_API_CACHE) {
-    //    std::ifstream fin(fname);
-    //    if (fin.is_open() && fin.good()) {
-    //        std::string str((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
-    //        fin.close();
-
-    //        return str;
-    //    }
-    //}
-
-    if (ENABLE_API_CACHE) {
-        std::ofstream fout(fname);
-        fout.write(response_string.c_str(), response_string.size());
-        fout.close();
-    }
-#endif
-
-    g_totalBytesDownloaded += response_string.size();
 
     return response_string;
 }
@@ -549,6 +512,9 @@ struct State {
 
             break;
         }
+
+        nFetches = getNFetches();
+        totalBytesDownloaded = getTotalBytesDownloaded();
     }
 
     ItemIds idsTop;
@@ -558,6 +524,9 @@ struct State {
     ItemIds idsNew;
 
     std::map<ItemId, Item> items;
+
+    int nFetches = 0;
+    uint64_t totalBytesDownloaded = 0;
 
     uint64_t lastUpdatePoll_s = 0;
     uint64_t lastStoriesPoll_s = 0;
@@ -1046,7 +1015,7 @@ extern "C" {
                              ImGuiWindowFlags_NoCollapse |
                              ImGuiWindowFlags_NoResize |
                              ImGuiWindowFlags_NoMove);
-                ImGui::Text(" API requests     : %d / %d B (next update in %d s)", g_nfetches, (int) g_totalBytesDownloaded, g_nextUpdate);
+                ImGui::Text(" API requests     : %d / %d B (next update in %d s)", stateHN.nFetches, (int) stateHN.totalBytesDownloaded, g_nextUpdate);
                 ImGui::Text(" Last API request : %s", g_curURI);
                 ImGui::Text(" Source code      : https://github.com/ggerganov/imtui/tree/master/examples/hnterm");
                 ImGui::End();

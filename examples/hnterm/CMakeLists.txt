@@ -1,5 +1,7 @@
 set(TARGET hnterm)
 
+option(HNTERM_ENABLE_API_CACHE "hnterm: enable API caching" OFF)
+
 if (EMSCRIPTEN)
     add_executable(${TARGET}
         main.cpp
@@ -36,3 +38,6 @@ else()
         )
 endif()
 
+if (HNTERM_ENABLE_API_CACHE)
+    target_compile_definitions(${TARGET} PRIVATE ENABLE_API_CACHE)
+endif()
