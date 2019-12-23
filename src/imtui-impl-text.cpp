@@ -14,14 +14,6 @@
 
 #define ABS(x) ((x >= 0) ? x : -x)
 
-#define DIFF(uv0, uv1) \
-    (std::fabs(uv0.x - uv1.x) > 1e-6 || \
-     std::fabs(uv0.x - uv2.x) > 1e-6 || \
-     std::fabs(uv1.x - uv2.x) > 1e-6 || \
-     std::fabs(uv0.y - uv1.y) > 1e-6 || \
-     std::fabs(uv0.y - uv2.y) > 1e-6 || \
-     std::fabs(uv1.y - uv2.y) > 1e-6)
-
 void ScanLine(int x1, int y1, int x2, int y2, int ymax, std::vector<int> & xrange) {
     int sx, sy, dx1, dy1, dx2, dy2, x, y, m, n, k, cnt;
 
@@ -71,27 +63,31 @@ void ScanLine(int x1, int y1, int x2, int y2, int ymax, std::vector<int> & xrang
     }
 }
 
+static std::vector<int> g_xrange;
+
 void drawTriangle(ImVec2 p0, ImVec2 p1, ImVec2 p2, unsigned char col, ImTui::TScreen & screen) {
     int ymin = std::min(std::min(std::min((float) screen.size(), p0.y), p1.y), p2.y);
     int ymax = std::max(std::max(std::max(0.0f, p0.y), p1.y), p2.y);
 
     int ydelta = ymax - ymin + 1;
 
-    std::vector<int> xrange(2*ydelta);
-
-    for (int y = 0; y < ydelta; y++) {
-        xrange[2*y+0] = 999999;
-        xrange[2*y+1] = -999999;
+    if ((int) g_xrange.size() < 2*ydelta) {
+        g_xrange.resize(2*ydelta);
     }
 
-    ScanLine(p0.x, p0.y - ymin, p1.x, p1.y - ymin, ydelta, xrange);
-    ScanLine(p1.x, p1.y - ymin, p2.x, p2.y - ymin, ydelta, xrange);
-    ScanLine(p2.x, p2.y - ymin, p0.x, p0.y - ymin, ydelta, xrange);
+    for (int y = 0; y < ydelta; y++) {
+        g_xrange[2*y+0] = 999999;
+        g_xrange[2*y+1] = -999999;
+    }
+
+    ScanLine(p0.x, p0.y - ymin, p1.x, p1.y - ymin, ydelta, g_xrange);
+    ScanLine(p1.x, p1.y - ymin, p2.x, p2.y - ymin, ydelta, g_xrange);
+    ScanLine(p2.x, p2.y - ymin, p0.x, p0.y - ymin, ydelta, g_xrange);
 
     for (int y = 0; y < ydelta; y++) {
-        if (xrange[2*y+1] >= xrange[2*y+0]) {
-            int x = xrange[2*y+0];
-            int len = 1 + xrange[2*y+1] - xrange[2*y+0];
+        if (g_xrange[2*y+1] >= g_xrange[2*y+0]) {
+            int x = g_xrange[2*y+0];
+            int len = 1 + g_xrange[2*y+1] - g_xrange[2*y+0];
 
             while (len--) {
                 if (x >= 0 && x < screen.nx && y + ymin >= 0 && y + ymin < screen.ny) {
@@ -143,8 +139,10 @@ void ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & scree
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
     int fb_width = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
     int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
-    if (fb_width <= 0 || fb_height <= 0)
+
+    if (fb_width <= 0 || fb_height <= 0) {
         return;
+    }
 
     screen.resize(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
     screen.clear();
@@ -197,7 +195,8 @@ void ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & scree
                         //auto col1 = cmd_list->VtxBuffer[vidx1].col;
                         //auto col2 = cmd_list->VtxBuffer[vidx2].col;
 
-                        if (DIFF(uv0, uv1) || DIFF(uv0, uv2) || DIFF(uv1, uv2)) {
+                        if (uv0.x != uv1.x || uv0.x != uv2.x || uv1.x != uv2.x ||
+                            uv0.y != uv1.y || uv0.y != uv2.y || uv1.y != uv2.y) {
                             int vvidx0 = cmd_list->IdxBuffer[pcmd->IdxOffset + i + 3];
                             int vvidx1 = cmd_list->IdxBuffer[pcmd->IdxOffset + i + 4];
                             int vvidx2 = cmd_list->IdxBuffer[pcmd->IdxOffset + i + 5];
@@ -278,6 +277,9 @@ bool ImTui_ImplText_Init() {
     ImGui::GetStyle().Colors[ImGuiCol_TitleBg]          = ImVec4(0.35, 0.35, 0.35, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15, 0.15, 0.15, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_TextSelectedBg]   = ImVec4(0.75, 0.75, 0.75, 0.5f);
+
+    ImGui::GetIO().KeyRepeatDelay = 0.050;
+    ImGui::GetIO().KeyRepeatRate = 0.050;
 
     ImFontConfig fontConfig;
     fontConfig.GlyphMinAdvanceX = 1.0f;

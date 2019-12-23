@@ -2,14 +2,12 @@
 
 #include "imtui/imtui-impl-ncurses.h"
 
-#include "imtui-common.h"
 #include "imtui-demo.h"
 
 int main() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    VSync vsync;
     ImTui::TScreen screen;
 
     ImTui_ImplNcurses_Init(true);
@@ -22,8 +20,6 @@ int main() {
     while (true) {
         ImTui_ImplNcurses_NewFrame();
         ImTui_ImplText_NewFrame();
-
-        ImGui::GetIO().DeltaTime = vsync.delta_s();
 
         ImGui::NewFrame();
 
@@ -44,8 +40,6 @@ int main() {
 
         ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
         ImTui_ImplNcurses_DrawScreen(screen);
-
-        vsync.wait();
     }
 
     ImTui_ImplText_Shutdown();

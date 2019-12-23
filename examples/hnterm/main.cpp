@@ -5,7 +5,6 @@
 #include "imtui/imtui.h"
 
 #include "json.h"
-#include "imtui-common.h"
 
 #ifdef __EMSCRIPTEN__
 
@@ -370,6 +369,8 @@ struct State {
     }
 
     void update(const ItemIds & toRefresh) {
+        updated = false;
+
         auto now = ::t_s();
 
         if (timeout(now, lastStoriesPoll_s)) {
@@ -380,6 +381,7 @@ struct State {
             ::requestJSONForURI(HN::kAPINewStories);
 
             lastStoriesPoll_s = ::t_s();
+            updated = true;
         } else {
             g_nextUpdate = lastStoriesPoll_s + 30 - now;
         }
@@ -388,6 +390,7 @@ struct State {
             ::requestJSONForURI(HN::kAPIUpdates);
 
             lastUpdatePoll_s = ::t_s();
+            updated = true;
         }
 
         {
@@ -395,6 +398,7 @@ struct State {
                 auto ids = HN::getStoriesIds(HN::kAPITopStories);
                 if (ids.empty() == false) {
                     idsTop = std::move(ids);
+                    updated = true;
                 }
             }
 
@@ -409,6 +413,7 @@ struct State {
                 auto ids = HN::getStoriesIds(HN::kAPIShowStories);
                 if (ids.empty() == false) {
                     idsShow = std::move(ids);
+                    updated = true;
                 }
             }
 
@@ -416,6 +421,7 @@ struct State {
                 auto ids = HN::getStoriesIds(HN::kAPIAskStories);
                 if (ids.empty() == false) {
                     idsAsk = std::move(ids);
+                    updated = true;
                 }
             }
 
@@ -423,6 +429,7 @@ struct State {
                 auto ids = HN::getStoriesIds(HN::kAPINewStories);
                 if (ids.empty() == false) {
                     idsNew = std::move(ids);
+                    updated = true;
                 }
             }
         }
@@ -441,6 +448,7 @@ struct State {
 
             ::requestJSONForURI(getItemURI(id));
             items[id].needRequest = false;
+            updated = true;
         }
 
         for (auto id : toRefresh) {
@@ -467,6 +475,7 @@ struct State {
                         if (item.needUpdate) {
                             parseStory(data, story);
                             item.needUpdate = false;
+                            updated = true;
                         }
                     }
                     break;
@@ -480,6 +489,7 @@ struct State {
                         if (item.needUpdate) {
                             parseComment(data, story);
                             item.needUpdate = false;
+                            updated = true;
                         }
                     }
                     break;
@@ -493,6 +503,7 @@ struct State {
                         if (item.needUpdate) {
                             parseJob(data, job);
                             item.needUpdate = false;
+                            updated = true;
                         }
                     }
                     break;
@@ -516,6 +527,8 @@ struct State {
         nFetches = getNFetches();
         totalBytesDownloaded = getTotalBytesDownloaded();
     }
+
+    bool updated = false;
 
     ItemIds idsTop;
     //ItemIds idsBest;
@@ -609,10 +622,6 @@ struct State {
 
 }
 
-#ifndef __EMSCRIPTEN__
-VSync vsync;
-#endif
-
 // HackerNews content
 HN::State stateHN;
 
@@ -651,25 +660,22 @@ extern "C" {
         bool render_frame() {
             stateHN.update(toRefresh);
             updateRequests_impl();
-
             toRefresh.clear();
+
+            bool isActive = stateHN.updated;
 
 #ifdef __EMSCRIPTEN__
             ImTui_ImplEmscripten_NewFrame();
 #else
-            ImTui_ImplNcurses_NewFrame();
+            isActive |= ImTui_ImplNcurses_NewFrame();
 #endif
             ImTui_ImplText_NewFrame();
 
-#ifndef __EMSCRIPTEN__
-            ImGui::GetIO().DeltaTime = vsync.delta_s();
-#endif
+            ImGui::NewFrame();
 
             if (ImGui::GetIO().DisplaySize.x < 50) {
                 stateUI.nWindows = 1;
             }
-
-            ImGui::NewFrame();
 
             for (int windowId = 0; windowId < stateUI.nWindows; ++windowId) {
                 const auto & items = stateHN.items;
@@ -1104,8 +1110,7 @@ extern "C" {
             ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
 
 #ifndef __EMSCRIPTEN__
-            ImTui_ImplNcurses_DrawScreen(screen);
-            vsync.wait();
+            ImTui_ImplNcurses_DrawScreen(screen, isActive);
 #endif
 
             return true;
@@ -1135,11 +1140,13 @@ int main(int argc, char ** argv) {
 #ifdef __EMSCRIPTEN__
     ImTui_ImplEmscripten_Init(true);
 #else
-    ImTui_ImplNcurses_Init(mouseSupport != 0);
+    // when no changes occured - limit frame rate to 3.0 fps to save CPU
+    ImTui_ImplNcurses_Init(mouseSupport != 0, 60.0, 3.0);
 #endif
     ImTui_ImplText_Init();
 
     ImVec4* colors = ImGui::GetStyle().Colors;
+
     colors[ImGuiCol_Text]                   = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
     colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
     colors[ImGuiCol_WindowBg]               = ImVec4(0.96f, 0.96f, 0.94f, 1.00f);

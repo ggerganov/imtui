@@ -73,9 +73,10 @@ uint64_t t_s() {
 }
 
 static size_t writeFunction(void *ptr, size_t size, size_t nmemb, Data* data) {
-    g_totalBytesDownloaded += size*nmemb;
+    size_t bytesDownloaded = size*nmemb;
+    g_totalBytesDownloaded += bytesDownloaded;
 
-    data->content.append((char*) ptr, size*nmemb);
+    data->content.append((char*) ptr, bytesDownloaded);
 
 #ifdef ENABLE_API_CACHE
     auto fname = ::getCacheFname(data->uri);
@@ -88,13 +89,14 @@ static size_t writeFunction(void *ptr, size_t size, size_t nmemb, Data* data) {
     g_fetchCache[data->uri] = std::move(data->content);
     data->content.clear();
 
-    return size * nmemb;
+    return bytesDownloaded;
 }
 
 static void addTransfer(CURLM *cm, int idx, std::string && uri) {
     if (g_fetchData[idx].eh == NULL) {
         g_fetchData[idx].eh = curl_easy_init();
     }
+
     CURL *eh = g_fetchData[idx].eh;
     curl_easy_setopt(eh, CURLOPT_URL, uri.c_str());
     curl_easy_setopt(eh, CURLOPT_PRIVATE, &g_fetchData[idx]);

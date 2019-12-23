@@ -9,11 +9,76 @@
 #include <ncurses.h>
 
 #include <array>
+#include <chrono>
 #include <map>
 #include <vector>
 #include <string>
+#include <thread>
 
-bool ImTui_ImplNcurses_Init(bool mouseSupport) {
+namespace {
+    struct VSync {
+        VSync(double fps_active = 60.0, double fps_idle = 60.0) :
+            tStepActive_us(1000000.0/fps_active),
+            tStepIdle_us(1000000.0/fps_idle) {}
+
+        uint64_t tStepActive_us;
+        uint64_t tStepIdle_us;
+        uint64_t tLast_us = t_us();
+        uint64_t tNext_us = tLast_us;
+
+        inline uint64_t t_us() const {
+            return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count(); // duh ..
+        }
+
+        inline void wait(bool active) {
+            uint64_t tNow_us = t_us();
+
+            auto tStep_us = active ? tStepActive_us : tStepIdle_us;
+            auto tNextCur_us = tNext_us + tStep_us;
+
+            wtimeout(stdscr, 0);
+            while (tNow_us < tNextCur_us - 100) {
+                if (tNow_us + 0.5*tStepActive_us < tNextCur_us) {
+                    if (int ch = wgetch(stdscr); ch != ERR) {
+                        ungetch(ch);
+                        tNextCur_us = tNow_us;
+                        wtimeout(stdscr, 1);
+
+                        return;
+                    }
+                }
+
+                std::this_thread::sleep_for(std::chrono::microseconds(
+                        std::min((uint64_t)(0.9*tStepActive_us),
+                                 (uint64_t) (0.9*(tNextCur_us - tNow_us))
+                                 )));
+
+                tNow_us = t_us();
+            }
+
+            tNext_us += tStep_us;
+            wtimeout(stdscr, 1);
+        }
+
+        inline float delta_s() {
+            uint64_t tNow_us = t_us();
+            uint64_t res = tNow_us - tLast_us;
+            tLast_us = tNow_us;
+
+            return float(res)/1e6f;
+        }
+    };
+}
+
+static VSync g_vsync;
+
+bool ImTui_ImplNcurses_Init(bool mouseSupport, float fps_active, float fps_idle) {
+    if (fps_idle < 0.0) {
+        fps_idle = fps_active;
+    }
+    fps_idle = std::min(fps_active, fps_idle);
+    g_vsync = VSync(fps_active, fps_idle);
+
     initscr();
     use_default_colors();
     start_color();
@@ -22,6 +87,7 @@ bool ImTui_ImplNcurses_Init(bool mouseSupport) {
     curs_set(0);
     nodelay(stdscr, TRUE);
     keypad(stdscr, TRUE);
+    wtimeout(stdscr, 1);
 
     if (mouseSupport) {
         mouseinterval(0);
@@ -65,7 +131,9 @@ void ImTui_ImplNcurses_Shutdown() {
     endwin();
 }
 
-void ImTui_ImplNcurses_NewFrame() {
+bool ImTui_ImplNcurses_NewFrame() {
+    bool hasInput = false;
+
 	int screenSizeX = 0;
 	int screenSizeY = 0;
 
@@ -81,9 +149,8 @@ void ImTui_ImplNcurses_NewFrame() {
 
     input[2] = 0;
 
-    static bool lastKeysDown[512];
-
-    std::fill(lastKeysDown, lastKeysDown + 512, 0);
+    auto & keysDown = ImGui::GetIO().KeysDown;
+    std::fill(keysDown, keysDown + 512, 0);
 
     ImGui::GetIO().KeyCtrl = false;
 
@@ -110,16 +177,19 @@ void ImTui_ImplNcurses_NewFrame() {
                 ImGui::GetIO().KeyCtrl |= ((mstate & 0x0F000000) == 0x01000000);
             }
         } else {
-            input[0] = c & 0x000000FF;
+            input[0] = (c & 0x000000FF);
             input[1] = (c & 0x0000FF00) >> 8;
             if (c < 128) {
                 ImGui::GetIO().AddInputCharactersUTF8(input);
             }
-            lastKeysDown[c] = true;
+            if (c == KEY_BACKSPACE || c == KEY_DC || c == 127) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Backspace]] = true;
+            } else {
+                keysDown[c] = true;
+            }
         }
-    }
-    for (int i = 0; i < 512; ++i) {
-        ImGui::GetIO().KeysDown[i] = lastKeysDown[i];
+
+        hasInput = true;
     }
 
     if (ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_A]]) ImGui::GetIO().KeyCtrl = true;
@@ -133,15 +203,24 @@ void ImTui_ImplNcurses_NewFrame() {
     ImGui::GetIO().MousePos.y = my;
     ImGui::GetIO().MouseDown[0] = lbut;
     ImGui::GetIO().MouseDown[1] = rbut;
+
+    ImGui::GetIO().DeltaTime = g_vsync.delta_s();
+
+    return hasInput;
 }
 
 // state
 int nColPairs = 1;
+int nActiveFrames = 10;
 ImTui::TScreen screenPrev;
 std::vector<uint8_t> curs;
 std::array<std::pair<bool, int>, 256*256> colPairs;
 
-void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen) {
+void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen, bool active) {
+    if (active) nActiveFrames = 10;
+
+    wrefresh(stdscr);
+
     int nx = screen.nx;
     int ny = screen.ny;
 
@@ -212,6 +291,8 @@ void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen) {
     if (!compare) {
         memcpy(screenPrev.data, screen.data, nx*ny*sizeof(ImTui::TCell));
     }
+
+    g_vsync.wait(nActiveFrames --> 0);
 }
 
 bool ImTui_ImplNcurses_ProcessEvent() {
