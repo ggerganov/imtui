@@ -5,6 +5,7 @@ option(HNTERM_ENABLE_API_CACHE "hnterm: enable API caching" OFF)
 if (EMSCRIPTEN)
     add_executable(${TARGET}
         main.cpp
+        hn-state.cpp
         impl-emscripten.cpp
         )
 
@@ -23,6 +24,7 @@ if (EMSCRIPTEN)
 else()
     add_executable(${TARGET}
         main.cpp
+        hn-state.cpp
         impl-ncurses.cpp
         )
 
