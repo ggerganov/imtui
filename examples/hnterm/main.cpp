@@ -625,9 +625,6 @@ struct State {
 // HackerNews content
 HN::State stateHN;
 
-// items that need to be updated
-HN::ItemIds toRefresh;
-
 // UI state
 UI::State stateUI;
 
@@ -658,9 +655,7 @@ extern "C" {
 
     EMSCRIPTEN_KEEPALIVE
         bool render_frame() {
-            stateHN.update(toRefresh);
-            updateRequests_impl();
-            toRefresh.clear();
+            HN::ItemIds toRefresh;
 
             bool isActive = stateHN.updated;
 
@@ -1112,6 +1107,9 @@ extern "C" {
 #ifndef __EMSCRIPTEN__
             ImTui_ImplNcurses_DrawScreen(screen, isActive);
 #endif
+
+            stateHN.update(toRefresh);
+            updateRequests_impl();
 
             return true;
         }
