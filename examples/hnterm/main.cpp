@@ -24,6 +24,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <functional>
 
 // global vars
 bool g_updated = false;
