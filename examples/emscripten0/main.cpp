@@ -1,12 +1,9 @@
 #include "imtui/imtui.h"
 #include "imtui/imtui-impl-emscripten.h"
 
-#include "imtui-common.h"
 #include "imtui-demo.h"
 
 #include <emscripten.h>
-
-bool show_demo_window = true;
 
 ImTui::TScreen * g_screen = nullptr;
 
@@ -25,7 +22,8 @@ extern "C" {
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
 
-            ImTui::ShowDemoWindow(&show_demo_window);
+            bool showDemoWindow = true;
+            ImTui::ShowDemoWindow(&showDemoWindow);
 
             ImGui::Render();
 
