@@ -8,33 +8,9 @@
 
 bool show_demo_window = true;
 
-ImTui::TScreen screen;
+ImTui::TScreen * g_screen = nullptr;
 
 extern "C" {
-#ifdef __EMSCRIPTEN__
-    EMSCRIPTEN_KEEPALIVE
-        void get_screen(char * buffer) {
-            int nx = screen.nx;
-            int ny = screen.ny;
-
-            int idx = 0;
-            for (int y = 0; y < ny; ++y) {
-                for (int x = 0; x < nx; ++x) {
-                    const auto & cell = screen.data[y*nx + x];
-                    buffer[idx] = cell & 0x000000FF; ++idx;
-                    buffer[idx] = (cell & 0x00FF0000) >> 16; ++idx;
-                    buffer[idx] = (cell & 0xFF000000) >> 24; ++idx;
-                }
-            }
-        }
-
-    EMSCRIPTEN_KEEPALIVE
-        void set_screen_size(int nx, int ny) {
-            ImGui::GetIO().DisplaySize.x = nx;
-            ImGui::GetIO().DisplaySize.y = ny;
-        }
-#endif
-
     EMSCRIPTEN_KEEPALIVE
         void render_frame() {
             ImTui_ImplText_NewFrame();
@@ -53,7 +29,7 @@ extern "C" {
 
             ImGui::Render();
 
-            ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
+            ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), g_screen);
         }
 }
 
@@ -62,7 +38,7 @@ int main() {
     ImGui::CreateContext();
 
     ImTui_ImplText_Init();
-    ImTui_ImplEmscripten_Init(true);
+    g_screen = ImTui_ImplEmscripten_Init(true);
 
     return 0;
 }

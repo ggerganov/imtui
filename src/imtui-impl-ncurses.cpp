@@ -71,8 +71,13 @@ namespace {
 }
 
 static VSync g_vsync;
+static ImTui::TScreen * g_screen = nullptr;
 
-bool ImTui_ImplNcurses_Init(bool mouseSupport, float fps_active, float fps_idle) {
+ImTui::TScreen * ImTui_ImplNcurses_Init(bool mouseSupport, float fps_active, float fps_idle) {
+    if (g_screen == nullptr) {
+        g_screen = new ImTui::TScreen();
+    }
+
     if (fps_idle < 0.0) {
         fps_idle = fps_active;
     }
@@ -124,11 +129,17 @@ bool ImTui_ImplNcurses_Init(bool mouseSupport, float fps_active, float fps_idle)
 	getmaxyx(stdscr, screenSizeY, screenSizeX);
 	ImGui::GetIO().DisplaySize = ImVec2(screenSizeX, screenSizeY);
 
-    return true;
+    return g_screen;
 }
 
 void ImTui_ImplNcurses_Shutdown() {
     endwin();
+
+    if (g_screen) {
+        delete g_screen;
+    }
+
+    g_screen = nullptr;
 }
 
 bool ImTui_ImplNcurses_NewFrame() {
@@ -216,13 +227,13 @@ ImTui::TScreen screenPrev;
 std::vector<uint8_t> curs;
 std::array<std::pair<bool, int>, 256*256> colPairs;
 
-void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen, bool active) {
+void ImTui_ImplNcurses_DrawScreen(bool active) {
     if (active) nActiveFrames = 10;
 
     wrefresh(stdscr);
 
-    int nx = screen.nx;
-    int ny = screen.ny;
+    int nx = g_screen->nx;
+    int ny = g_screen->ny;
 
     bool compare = true;
 
@@ -238,7 +249,7 @@ void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen, bool active) {
         bool isSame = compare;
         if (compare) {
             for (int x = 0; x < nx; ++x) {
-                if (screenPrev.data[y*nx + x] != screen.data[y*nx + x]) {
+                if (screenPrev.data[y*nx + x] != g_screen->data[y*nx + x]) {
                     isSame = false;
                     break;
                 }
@@ -249,7 +260,7 @@ void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen, bool active) {
         int lastp = 0xFFFFFFFF;
         move(y, 0);
         for (int x = 0; x < nx; ++x) {
-            auto cell = screen.data[y*nx + x];
+            auto cell = g_screen->data[y*nx + x];
             uint16_t f = (cell & 0x00FF0000) >> 16;
             uint16_t b = (cell & 0xFF000000) >> 24;
             uint16_t p = b*256 + f;
@@ -284,12 +295,12 @@ void ImTui_ImplNcurses_DrawScreen(const ImTui::TScreen & screen, bool active) {
         }
 
         if (compare) {
-            memcpy(screenPrev.data + y*nx, screen.data + y*nx, nx*sizeof(ImTui::TCell));
+            memcpy(screenPrev.data + y*nx, g_screen->data + y*nx, nx*sizeof(ImTui::TCell));
         }
     }
 
     if (!compare) {
-        memcpy(screenPrev.data, screen.data, nx*ny*sizeof(ImTui::TCell));
+        memcpy(screenPrev.data, g_screen->data, nx*ny*sizeof(ImTui::TCell));
     }
 
     g_vsync.wait(nActiveFrames --> 0);

@@ -65,7 +65,7 @@ uint64_t getTotalBytesDownloaded() {
     return g_totalBytesDownloaded;
 }
 
-uint64_t getNFetches() {
+int getNFetches() {
     return g_nFetches;
 }
 

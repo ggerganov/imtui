@@ -8,9 +8,7 @@ int main() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    ImTui::TScreen screen;
-
-    ImTui_ImplNcurses_Init(true);
+    auto screen = ImTui_ImplNcurses_Init(true);
     ImTui_ImplText_Init();
 
     bool demo = true;
@@ -39,7 +37,7 @@ int main() {
         ImGui::Render();
 
         ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
-        ImTui_ImplNcurses_DrawScreen(screen);
+        ImTui_ImplNcurses_DrawScreen();
     }
 
     ImTui_ImplText_Shutdown();

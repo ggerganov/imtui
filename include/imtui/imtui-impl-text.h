@@ -4,6 +4,8 @@
 
 #pragma once
 
+struct ImDrawData;
+
 namespace ImTui {
 struct TScreen;
 }
@@ -11,4 +13,4 @@ struct TScreen;
 bool ImTui_ImplText_Init();
 void ImTui_ImplText_Shutdown();
 void ImTui_ImplText_NewFrame();
-void ImTui_ImplText_RenderDrawData(ImDrawData* draw_data, ImTui::TScreen & screen);
+void ImTui_ImplText_RenderDrawData(ImDrawData * drawData, ImTui::TScreen * screen);

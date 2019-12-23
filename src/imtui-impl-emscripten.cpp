@@ -17,10 +17,15 @@ static bool  lastMouseDown[5] = { false, false, false, false, false };
 static float lastMouseWheel = 0.0;
 static float lastMouseWheelH = 0.0;
 
+static ImTui::TScreen * g_screen = nullptr;
 static std::string lastAddText = "";
 static bool lastKeysDown[512];
 
-bool ImTui_ImplEmscripten_Init(bool mouseSupport) {
+ImTui::TScreen * ImTui_ImplEmscripten_Init(bool mouseSupport) {
+    if (g_screen == nullptr) {
+        g_screen = new ImTui::TScreen();
+    }
+
     ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
     ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]   = 37;
     ImGui::GetIO().KeyMap[ImGuiKey_RightArrow]  = 39;
@@ -46,10 +51,15 @@ bool ImTui_ImplEmscripten_Init(bool mouseSupport) {
 
     ignoreMouse = !mouseSupport;
 
-    return true;
+    return g_screen;
 }
 
 void ImTui_ImplEmscripten_Shutdown() {
+    if (g_screen) {
+        delete g_screen;
+    }
+
+    g_screen = nullptr;
 }
 
 void ImTui_ImplEmscripten_NewFrame() {
@@ -107,6 +117,22 @@ void set_mouse_wheel(float x, float y) {
 
     lastMouseWheelH = x;
     lastMouseWheel  = y;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void get_screen(char * buffer) {
+    int nx = g_screen->nx;
+    int ny = g_screen->ny;
+
+    int idx = 0;
+    for (int y = 0; y < ny; ++y) {
+        for (int x = 0; x < nx; ++x) {
+            const auto & cell = g_screen->data[y*nx + x];
+            buffer[idx] = cell & 0x000000FF; ++idx;
+            buffer[idx] = (cell & 0x00FF0000) >> 16; ++idx;
+            buffer[idx] = (cell & 0xFF000000) >> 24; ++idx;
+        }
+    }
 }
 
 EMSCRIPTEN_KEEPALIVE
@@ -181,3 +207,8 @@ void set_key_press(int key) {
     }
 }
 
+EMSCRIPTEN_KEEPALIVE
+void set_screen_size(int nx, int ny) {
+    ImGui::GetIO().DisplaySize.x = nx;
+    ImGui::GetIO().DisplaySize.y = ny;
+}

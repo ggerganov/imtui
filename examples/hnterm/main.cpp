@@ -30,9 +30,7 @@
 // global vars
 char g_curURI[512];
 int g_nextUpdate = 0;
-
-// screen buffer
-ImTui::TScreen screen;
+ImTui::TScreen * g_screen = nullptr;
 
 // platform specific functions
 extern bool hnInit();
@@ -48,6 +46,7 @@ extern uint64_t t_s();
 // helper functions
 namespace {
 
+[[maybe_unused]]
 std::map<std::string, std::string> parseCmdArguments(int argc, char ** argv) {
     int last = argc;
     std::map<std::string, std::string> res;
@@ -629,39 +628,14 @@ HN::State stateHN;
 UI::State stateUI;
 
 extern "C" {
-#ifdef __EMSCRIPTEN__
-    EMSCRIPTEN_KEEPALIVE
-        void get_screen(char * buffer) {
-            int nx = screen.nx;
-            int ny = screen.ny;
-
-            int idx = 0;
-            for (int y = 0; y < ny; ++y) {
-                for (int x = 0; x < nx; ++x) {
-                    const auto & cell = screen.data[y*nx + x];
-                    buffer[idx] = cell & 0x000000FF; ++idx;
-                    buffer[idx] = (cell & 0x00FF0000) >> 16; ++idx;
-                    buffer[idx] = (cell & 0xFF000000) >> 24; ++idx;
-                }
-            }
-        }
-
-    EMSCRIPTEN_KEEPALIVE
-        void set_screen_size(int nx, int ny) {
-            ImGui::GetIO().DisplaySize.x = nx;
-            ImGui::GetIO().DisplaySize.y = ny;
-        }
-#endif
-
     EMSCRIPTEN_KEEPALIVE
         bool render_frame() {
             HN::ItemIds toRefresh;
 
-            bool isActive = stateHN.updated;
-
 #ifdef __EMSCRIPTEN__
             ImTui_ImplEmscripten_NewFrame();
 #else
+            bool isActive = stateHN.updated;
             isActive |= ImTui_ImplNcurses_NewFrame();
 #endif
             ImTui_ImplText_NewFrame();
@@ -1102,10 +1076,10 @@ extern "C" {
 
             ImGui::Render();
 
-            ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), screen);
+            ImTui_ImplText_RenderDrawData(ImGui::GetDrawData(), g_screen);
 
 #ifndef __EMSCRIPTEN__
-            ImTui_ImplNcurses_DrawScreen(screen, isActive);
+            ImTui_ImplNcurses_DrawScreen(isActive);
 #endif
 
             stateHN.update(toRefresh);
@@ -1115,7 +1089,7 @@ extern "C" {
         }
 }
 
-int main(int argc, char ** argv) {
+int main([[maybe_unused]] int argc, [[maybe_unused]] char ** argv) {
 #ifndef __EMSCRIPTEN__
     auto argm = parseCmdArguments(argc, argv);
     int mouseSupport = argm.find("--mouse") != argm.end() || argm.find("m") != argm.end();
@@ -1136,10 +1110,10 @@ int main(int argc, char ** argv) {
     ImGui::CreateContext();
 
 #ifdef __EMSCRIPTEN__
-    ImTui_ImplEmscripten_Init(true);
+    g_screen = ImTui_ImplEmscripten_Init(true);
 #else
     // when no changes occured - limit frame rate to 3.0 fps to save CPU
-    ImTui_ImplNcurses_Init(mouseSupport != 0, 60.0, 3.0);
+    g_screen = ImTui_ImplNcurses_Init(mouseSupport != 0, 60.0, 3.0);
 #endif
     ImTui_ImplText_Init();
 
@@ -1159,16 +1133,11 @@ int main(int argc, char ** argv) {
     while (true) {
         if (render_frame() == false) break;
     }
-#endif
 
     ImTui_ImplText_Shutdown();
-#ifdef __EMSCRIPTEN__
-    ImTui_ImplEmscripten_Shutdown();
-#else
     ImTui_ImplNcurses_Shutdown();
-#endif
-
     hnFree();
+#endif
 
     return 0;
 }
