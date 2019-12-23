@@ -74,6 +74,12 @@ enum class StoryListMode : int {
     COUNT,
 };
 
+enum class ColorScheme : int {
+    Default,
+    Dark,
+    COUNT,
+};
+
 std::map<WindowContent, std::string> kContentStr = {
     { WindowContent::Top, "Top" },
     //{ WindowContent::Best, "Best" },
@@ -95,6 +101,7 @@ struct State {
     int hoveredWindowId = 0;
     int statusWindowHeight = 4;
 
+    ColorScheme colorScheme = ColorScheme::Default;
     StoryListMode storyListMode = StoryListMode::Normal;
 #ifdef __EMSCRIPTEN__
     bool showHelpWelcome = true;
@@ -109,6 +116,47 @@ struct State {
     char statusWindowHeader[512];
 
     std::map<int, bool> collapsed;
+
+    void changeColorScheme(bool inc = true) {
+        if (inc) {
+            colorScheme = (ColorScheme)(((int) colorScheme + 1) % ((int)ColorScheme::COUNT));
+        }
+
+        ImVec4* colors = ImGui::GetStyle().Colors;
+        switch (colorScheme) {
+            case ColorScheme::Default:
+                {
+                    colors[ImGuiCol_Text]                   = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+                    colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+                    colors[ImGuiCol_WindowBg]               = ImVec4(0.96f, 0.96f, 0.94f, 1.00f);
+                    colors[ImGuiCol_TitleBg]                = ImVec4(1.00f, 0.40f, 0.00f, 1.00f);
+                    colors[ImGuiCol_TitleBgActive]          = ImVec4(1.00f, 0.40f, 0.00f, 1.00f);
+                    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.69f, 0.25f, 0.00f, 1.00f);
+                    colors[ImGuiCol_ChildBg]                = ImVec4(0.96f, 0.96f, 0.94f, 1.00f);
+                    colors[ImGuiCol_PopupBg]                = ImVec4(0.96f, 0.96f, 0.94f, 1.00f);
+                    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+
+                }
+                break;
+            case ColorScheme::Dark:
+                {
+
+                    colors[ImGuiCol_Text]                   = ImVec4(0.00f, 1.00f, 0.00f, 1.00f);
+                    colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+                    colors[ImGuiCol_WindowBg]               = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+                    colors[ImGuiCol_TitleBg]                = ImVec4(0.10f, 0.20f, 0.10f, 1.00f);
+                    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.10f, 0.20f, 0.10f, 1.00f);
+                    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.50f, 1.00f, 0.50f, 1.00f);
+                    colors[ImGuiCol_ChildBg]                = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+                    colors[ImGuiCol_PopupBg]                = ImVec4(0.00f, 0.10f, 0.00f, 1.00f);
+                    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+                }
+                break;
+            default:
+                {
+                }
+        }
+    }
 
     std::array<WindowData, 3> windows { {
         {
@@ -543,6 +591,10 @@ extern "C" {
                 stateUI.storyListMode = (UI::StoryListMode)(((int)(stateUI.storyListMode) + 1)%((int)(UI::StoryListMode::COUNT)));
             }
 
+            if (ImGui::IsKeyPressed('c', false)) {
+                stateUI.changeColorScheme();
+            }
+
             if (ImGui::IsKeyPressed('Q', false)) {
                 return false;
             }
@@ -581,6 +633,7 @@ extern "C" {
                 ImGui::Text("    q/b/bkspc   - close comments    ");
                 ImGui::Text("    v           - toggle story view mode    ");
                 ImGui::Text("    r           - force refresh story    ");
+                ImGui::Text("    c           - change colors    ");
                 ImGui::Text("    Q           - quit    ");
                 ImGui::Text(" ");
 
@@ -645,17 +698,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char ** argv) {
 #endif
     ImTui_ImplText_Init();
 
-    ImVec4* colors = ImGui::GetStyle().Colors;
-
-    colors[ImGuiCol_Text]                   = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-    colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-    colors[ImGuiCol_WindowBg]               = ImVec4(0.96f, 0.96f, 0.94f, 1.00f);
-    colors[ImGuiCol_TitleBg]                = ImVec4(1.00f, 0.40f, 0.00f, 1.00f);
-    colors[ImGuiCol_TitleBgActive]          = ImVec4(1.00f, 0.40f, 0.00f, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.69f, 0.25f, 0.00f, 1.00f);
-    colors[ImGuiCol_ChildBg]                = ImVec4(0.96f, 0.96f, 0.94f, 1.00f);
-    colors[ImGuiCol_PopupBg]                = ImVec4(0.96f, 0.96f, 0.94f, 1.00f);
-    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    stateUI.changeColorScheme(false);
 
 #ifndef __EMSCRIPTEN__
     while (true) {
