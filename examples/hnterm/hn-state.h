@@ -77,11 +77,14 @@ struct Item {
     bool needUpdate = true;
     bool needRequest = true;
 
+    uint64_t lastForceUpdate_s = 0;
+
     std::variant<Story, Comment, Job, Poll, PollOpt> data;
 };
 
 struct State {
     bool update(const ItemIds & toRefresh);
+    void forceUpdate(const ItemIds & toUpdate);
 
     bool timeout(uint64_t now, uint64_t last) const;
     std::string timeSince(uint64_t t) const;
@@ -98,7 +101,6 @@ struct State {
     uint64_t totalBytesDownloaded = 0;
 
     uint64_t lastUpdatePoll_s = 0;
-    uint64_t lastStoriesPoll_s = 0;
 
     char curURI[512];
     int nextUpdate = 0;

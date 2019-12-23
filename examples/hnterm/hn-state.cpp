@@ -238,24 +238,18 @@ namespace HN {
 
         auto now = ::t_s();
 
-        if (timeout(now, lastStoriesPoll_s)) {
+        if (timeout(now, lastUpdatePoll_s)) {
             requestJSONForURI(HN::kAPITopStories);
             //requestJSONForURI(HN::kAPIBestStories);
             requestJSONForURI(HN::kAPIShowStories);
             requestJSONForURI(HN::kAPIAskStories);
             requestJSONForURI(HN::kAPINewStories);
-
-            lastStoriesPoll_s = ::t_s();
-            updated = true;
-        } else {
-            nextUpdate = lastStoriesPoll_s + 30 - now;
-        }
-
-        if (timeout(now, lastUpdatePoll_s)) {
             requestJSONForURI(HN::kAPIUpdates);
 
             lastUpdatePoll_s = ::t_s();
             updated = true;
+        } else {
+            nextUpdate = lastUpdatePoll_s + 30 - now;
         }
 
         {
@@ -395,6 +389,19 @@ namespace HN {
         updateRequests_impl();
 
         return updated;
+    }
+
+    void State::forceUpdate(const ItemIds & toUpdate) {
+        auto tNow_s = t_s();
+        for (auto id : toUpdate) {
+            if (items.find(id) == items.end()) continue;
+            if (tNow_s - items[id].lastForceUpdate_s > 60) {
+                items[id].needUpdate = true;
+                items[id].needRequest = true;
+
+                items[id].lastForceUpdate_s = tNow_s;
+            }
+        }
     }
 
     bool State::timeout(uint64_t now, uint64_t last) const {

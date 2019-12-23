@@ -140,6 +140,7 @@ UI::State stateUI;
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
         bool render_frame() {
+            HN::ItemIds toUpdate;
             HN::ItemIds toRefresh;
 
 #ifdef __EMSCRIPTEN__
@@ -315,6 +316,10 @@ extern "C" {
                             }
                         }
 
+                        if (ImGui::IsKeyPressed('r', false)) {
+                            toUpdate.push_back(storyIds[window.hoveredStoryId]);
+                        }
+
                         if (ImGui::IsKeyPressed('k', true) ||
                             ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_UpArrow], true)) {
                             window.hoveredStoryId = std::max(0, window.hoveredStoryId - 1);
@@ -357,12 +362,17 @@ extern "C" {
                         ImGui::Text("%s", "");
 
                         int curCommentId = 0;
+                        bool forceUpdate = false;
 
                         std::function<void(const HN::ItemIds & commentIds, int indent)> renderComments;
                         renderComments = [&](const HN::ItemIds & commentIds, int indent) {
                             const int nComments = commentIds.size();
                             for (int i = 0; i < nComments; ++i) {
                                 const auto & id = commentIds[i];
+
+                                if (forceUpdate) {
+                                    toUpdate.push_back(id);
+                                }
 
                                 toRefresh.push_back(commentIds[i]);
                                 if (items.find(id) == items.end() || std::holds_alternative<HN::Comment>(items.at(id).data) == false) {
@@ -400,7 +410,7 @@ extern "C" {
                                     ImGui::PopStyleColor(1);
                                 }
 
-                                if (stateUI.collapsed[id] == false ) {
+                                if (stateUI.collapsed[id] == false) {
                                     ImGui::PushTextWrapPos(ImGui::GetContentRegionAvailWidth());
                                     ImGui::Text("%*s", indent, "");
                                     ImGui::SameLine();
@@ -437,6 +447,13 @@ extern "C" {
                                 }
                             }
                         };
+
+                        if (windowId == stateUI.hoveredWindowId) {
+                            if (ImGui::IsKeyPressed('r', false)) {
+                                toUpdate.push_back(story.id);
+                                forceUpdate = true;
+                            }
+                        }
 
                         ImGui::BeginChild("##comments", ImVec2(0, 0), false, ImGuiWindowFlags_NoScrollbar);
                         renderComments(story.kids, 0);
@@ -522,7 +539,7 @@ extern "C" {
                 stateUI.nWindows = 3;
             }
 
-            if (ImGui::IsKeyPressed('c', false)) {
+            if (ImGui::IsKeyPressed('v', false)) {
                 stateUI.storyListMode = (UI::StoryListMode)(((int)(stateUI.storyListMode) + 1)%((int)(UI::StoryListMode::COUNT)));
             }
 
@@ -562,7 +579,8 @@ extern "C" {
                 ImGui::Text("    Tab         - change current window content    ");
                 ImGui::Text("    1/2/3       - change number of windows    ");
                 ImGui::Text("    q/b/bkspc   - close comments    ");
-                ImGui::Text("    c           - toggle story mode    ");
+                ImGui::Text("    v           - toggle story view mode    ");
+                ImGui::Text("    r           - force refresh story    ");
                 ImGui::Text("    Q           - quit    ");
                 ImGui::Text(" ");
 
@@ -592,6 +610,7 @@ extern "C" {
             ImTui_ImplNcurses_DrawScreen(isActive);
 #endif
 
+            stateHN.forceUpdate(toUpdate);
             g_updated = stateHN.update(toRefresh);
 
             return true;
