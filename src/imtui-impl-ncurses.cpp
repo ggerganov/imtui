@@ -123,6 +123,9 @@ ImTui::TScreen * ImTui_ImplNcurses_Init(bool mouseSupport, float fps_active, flo
     ImGui::GetIO().KeyMap[ImGuiKey_Y]           = 25;
     ImGui::GetIO().KeyMap[ImGuiKey_Z]           = 26;
 
+    ImGui::GetIO().KeyRepeatDelay = 0.050;
+    ImGui::GetIO().KeyRepeatRate = 0.050;
+
 	int screenSizeX = 0;
 	int screenSizeY = 0;
 

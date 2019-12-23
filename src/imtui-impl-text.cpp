@@ -278,9 +278,6 @@ bool ImTui_ImplText_Init() {
     ImGui::GetStyle().Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15, 0.15, 0.15, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_TextSelectedBg]   = ImVec4(0.75, 0.75, 0.75, 0.5f);
 
-    ImGui::GetIO().KeyRepeatDelay = 0.050;
-    ImGui::GetIO().KeyRepeatRate = 0.050;
-
     ImFontConfig fontConfig;
     fontConfig.GlyphMinAdvanceX = 1.0f;
     fontConfig.SizePixels = 1.00;
