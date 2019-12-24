@@ -4,6 +4,8 @@ Interactive browsing of [Hacker News](https://news.ycombinator.com/news) in the 
 
 [![hnterm-demo](https://asciinema.org/a/gJakwNnEcgmGzZYiYIzFA1n8R.svg)](https://asciinema.org/a/gJakwNnEcgmGzZYiYIzFA1n8R)
 
+<a href="https://i.imgur.com/JMuM62I.png" target="_blank">![hnterm-dark](https://i.imgur.com/JMuM62I.png)</a>
+
 ## Live demo in the browser
 
 The Emscripten port of HNTerm uses Emscripten's Fetch API instead of `libcurl` to perform requests to the [HN API](https://github.com/HackerNews/API). 
