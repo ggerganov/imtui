@@ -2459,7 +2459,7 @@ static void ShowDemoWindowPopups()
         if (ImGui::Button("Select.."))
             ImGui::OpenPopup("my_select_popup");
         ImGui::SameLine();
-        ImGui::TextUnformatted(selected_fish == -1 ? "<None>" : names[selected_fish]);
+        ImGui::TextUnformatted(selected_fish == -1 ? "[None]" : names[selected_fish]);
         if (ImGui::BeginPopup("my_select_popup"))
         {
             ImGui::Text("Aquarium");
