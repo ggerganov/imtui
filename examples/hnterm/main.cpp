@@ -77,6 +77,7 @@ enum class StoryListMode : int {
 enum class ColorScheme : int {
     Default,
     Dark,
+    Green,
     COUNT,
 };
 
@@ -101,7 +102,7 @@ struct State {
     int hoveredWindowId = 0;
     int statusWindowHeight = 4;
 
-    ColorScheme colorScheme = ColorScheme::Default;
+    ColorScheme colorScheme = ColorScheme::Dark;
     StoryListMode storyListMode = StoryListMode::Normal;
 #ifdef __EMSCRIPTEN__
     bool showHelpWelcome = true;
@@ -135,20 +136,31 @@ struct State {
                     colors[ImGuiCol_ChildBg]                = ImVec4(0.96f, 0.96f, 0.94f, 1.00f);
                     colors[ImGuiCol_PopupBg]                = ImVec4(0.96f, 0.96f, 0.94f, 1.00f);
                     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-
                 }
                 break;
             case ColorScheme::Dark:
                 {
-
+                    colors[ImGuiCol_Text]                   = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+                    colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+                    colors[ImGuiCol_WindowBg]               = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+                    colors[ImGuiCol_TitleBg]                = ImVec4(1.00f, 0.40f, 0.00f, 0.50f);
+                    colors[ImGuiCol_TitleBgActive]          = ImVec4(1.00f, 0.40f, 0.00f, 0.50f);
+                    colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.69f, 0.25f, 0.00f, 0.50f);
+                    colors[ImGuiCol_ChildBg]                = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+                    colors[ImGuiCol_PopupBg]                = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+                    colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+                }
+                break;
+            case ColorScheme::Green:
+                {
                     colors[ImGuiCol_Text]                   = ImVec4(0.00f, 1.00f, 0.00f, 1.00f);
                     colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-                    colors[ImGuiCol_WindowBg]               = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-                    colors[ImGuiCol_TitleBg]                = ImVec4(0.10f, 0.20f, 0.10f, 1.00f);
-                    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.10f, 0.20f, 0.10f, 1.00f);
+                    colors[ImGuiCol_WindowBg]               = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+                    colors[ImGuiCol_TitleBg]                = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+                    colors[ImGuiCol_TitleBgActive]          = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
                     colors[ImGuiCol_TitleBgCollapsed]       = ImVec4(0.50f, 1.00f, 0.50f, 1.00f);
-                    colors[ImGuiCol_ChildBg]                = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-                    colors[ImGuiCol_PopupBg]                = ImVec4(0.00f, 0.10f, 0.00f, 1.00f);
+                    colors[ImGuiCol_ChildBg]                = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+                    colors[ImGuiCol_PopupBg]                = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
                     colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
                 }
                 break;
@@ -434,8 +446,9 @@ extern "C" {
                                 snprintf(header, 128, "%*s %s %s ago [%s]", indent, "", comment.by.c_str(), stateHN.timeSince(comment.time).c_str(), stateUI.collapsed[id] ? "+" : "-");
 
                                 if (windowId == stateUI.hoveredWindowId && curCommentId == window.hoveredCommentId) {
-                                    auto col0 = ImGui::GetStyleColorVec4(ImGuiCol_Text);
-                                    ImGui::PushStyleColor(ImGuiCol_TextDisabled, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+                                    auto col0 = ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled);
+                                    auto col1 = ImGui::GetStyleColorVec4(ImGuiCol_WindowBg);
+                                    ImGui::PushStyleColor(ImGuiCol_TextDisabled, col1);
 
                                     auto p0 = ImGui::GetCursorScreenPos();
                                     p0.x += 1 + indent;
