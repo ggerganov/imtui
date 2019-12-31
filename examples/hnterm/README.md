@@ -1,3 +1,7 @@
+*Note: this example has been moved in a standalone repository - https://github.com/ggerganov/hnterm*
+
+*Future development will continue there*
+
 # hnterm
 
 Interactive browsing of [Hacker News](https://news.ycombinator.com/news) in the terminal
