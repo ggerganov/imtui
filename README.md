@@ -25,7 +25,7 @@ For basic usage of ImTui, check one of the available samples:
 
 - [example-ncurses0](https://github.com/ggerganov/imtui/blob/master/examples/ncurses0/main.cpp)
 - [example-emscripten0](https://github.com/ggerganov/imtui/blob/master/examples/emscripten0/main.cpp)
-- [hnterm](https://github.com/ggerganov/imtui/blob/master/examples/hnterm/) - a simple tool to browse Hacker News in the terminal
+- [hnterm](https://github.com/ggerganov/hnterm) - a simple tool to browse Hacker News in the terminal
 
 *Note: the current implementation is experimental, so don't expect all things to work.*
 
