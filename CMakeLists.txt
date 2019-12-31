@@ -20,7 +20,11 @@ if (EMSCRIPTEN)
 else()
     set(IMTUI_SUPPORT_NCURSES_DEFAULT ON)
     set(IMTUI_SUPPORT_CURL_DEFAULT ON)
-    set(IMTUI_LIBRARY_TYPE SHARED)
+    if (BUILD_SHARED_LIBS)
+        set(IMTUI_LIBRARY_TYPE SHARED)
+    else ()
+        set(IMTUI_LIBRARY_TYPE STATIC)
+    endif()
 endif()
 
 # options
