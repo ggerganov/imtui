@@ -93,7 +93,7 @@ void drawTriangle(ImVec2 p0, ImVec2 p1, ImVec2 p2, unsigned char col, ImTui::TSc
                 if (x >= 0 && x < screen->nx && y + ymin >= 0 && y + ymin < screen->ny) {
                     auto & cell = screen->data[(y + ymin)*screen->nx + x];
                     cell &= 0x00FF0000;
-                    cell |= ' ';
+                    //cell |= ' ';
                     cell |= ((ImTui::TCell)(col) << 24);
                 }
                 ++x;

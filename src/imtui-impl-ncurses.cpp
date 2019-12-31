@@ -281,8 +281,10 @@ static ImTui::TScreen screenPrev;
 static std::vector<uint8_t> curs;
 static std::array<std::pair<bool, int>, 256*256> colPairs;
 
+std::vector<uint8_t> nRandom;
+
 void ImTui_ImplNcurses_DrawScreen(bool active) {
-    if (active) nActiveFrames = 10;
+    if (active) nActiveFrames = 10000;
 
     wrefresh(stdscr);
 
@@ -296,6 +298,21 @@ void ImTui_ImplNcurses_DrawScreen(bool active) {
         compare = false;
     }
 
+    int nR = 0;
+    nRandom.resize(nx*ny, 0);
+    for (int i = 1; i < nx*ny - 1; ++i) {
+        uint16_t c = g_screen->data[i] & 0x0000FFFF;
+        uint16_t o = screenPrev.data[i] & 0x0000FFFF;
+        if (c == ' ' || c == 0) {
+            nRandom[i] = 0;
+        } else if (nRandom[i] == 0 && (o == ' ' || o == 0) && (screenPrev.data[i] & 0x0000FFFF) != (g_screen->data[i] & 0x0000FFFF)) {
+            nRandom[i] = 3;
+            nRandom[i-1] = 3;
+            nRandom[i+1] = 3;
+            nActiveFrames = 10000;
+        }
+    }
+
     int ic = 0;
     curs.resize(nx + 1);
 
@@ -303,13 +320,13 @@ void ImTui_ImplNcurses_DrawScreen(bool active) {
         bool isSame = compare;
         if (compare) {
             for (int x = 0; x < nx; ++x) {
-                if (screenPrev.data[y*nx + x] != g_screen->data[y*nx + x]) {
+                if (nRandom[y*nx + x] != 0 || screenPrev.data[y*nx + x] != g_screen->data[y*nx + x]) {
                     isSame = false;
                     break;
                 }
             }
         }
-        if (isSame) continue;
+        if (isSame || nR > 100) continue;
 
         int lastp = 0xFFFFFFFF;
         move(y, 0);
@@ -337,7 +354,20 @@ void ImTui_ImplNcurses_DrawScreen(bool active) {
                 lastp = p;
             }
 
-            const uint16_t c = cell & 0x0000FFFF;
+            uint16_t c = cell & 0x0000FFFF;
+            if (nRandom[y*nx + x] > 0) {
+                if (nRandom[y*nx + x] == 1) {
+                    --nRandom[y*nx + x];
+                } else if (rand()%100 < 75) {
+                //} else if (x < 3 || (nRandom[y*nx + x - 1] == 0 && nRandom[y*nx + x - 2] == 0 && nRandom[y*nx + x - 3] == 0)) {
+                    --nRandom[y*nx + x];
+                    c = 33 + rand()%65;
+                    ++nR;
+                } else {
+                    c = ' ';
+                }
+            }
+
             curs[ic++] = c > 0 ? c : ' ';
         }
 
