@@ -18,6 +18,10 @@ if (IMTUI_SUPPORT_NCURSES)
     add_subdirectory(ncurses0)
 
     if (IMTUI_SUPPORT_CURL)
+        if (IMTUI_SUPPORT_CURL)
+            find_package(CURL REQUIRED)
+        endif()
+
         add_subdirectory(hnterm)
     endif()
 endif()

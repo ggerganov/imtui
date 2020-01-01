@@ -12,8 +12,6 @@ else()
 endif()
 
 if (EMSCRIPTEN)
-    set (CMAKE_CXX_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s FETCH=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0")
-
     set(IMTUI_SUPPORT_NCURSES_DEFAULT OFF)
     set(IMTUI_SUPPORT_CURL_DEFAULT OFF)
     set(IMTUI_LIBRARY_TYPE STATIC)
@@ -62,10 +60,6 @@ endif()
 
 if (IMTUI_SUPPORT_NCURSES)
     find_package(Curses REQUIRED)
-endif()
-
-if (IMTUI_SUPPORT_CURL)
-    find_package(CURL REQUIRED)
 endif()
 
 # main
