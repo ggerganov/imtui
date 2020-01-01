@@ -1,10 +1,10 @@
 set(TARGET hnterm)
 
-set (CMAKE_CXX_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s FETCH=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0")
-
 option(HNTERM_ENABLE_API_CACHE "hnterm: enable API caching" OFF)
 
 if (EMSCRIPTEN)
+    set (CMAKE_CXX_FLAGS "-s ALLOW_MEMORY_GROWTH=1 -s FETCH=1 -s ASSERTIONS=1 -s DISABLE_EXCEPTION_CATCHING=0")
+
     add_executable(${TARGET}
         main.cpp
         hn-state.cpp
