@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/ggerganov/imtui/workflows/CI/badge.svg)](https://github.com/ggerganov/imtui/actions)
+
 # imtui
 
 ImTui is an immediate mode text-based user interface library. Supports 256 ANSI colors and mouse/keyboard input. 
