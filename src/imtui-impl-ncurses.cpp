@@ -39,7 +39,8 @@ namespace {
             wtimeout(stdscr, 0);
             while (tNow_us < tNextCur_us - 100) {
                 if (tNow_us + 0.5*tStepActive_us < tNextCur_us) {
-                    if (int ch = wgetch(stdscr); ch != ERR) {
+		    int ch = wgetch(stdscr);
+                    if (ch != ERR) {
                         ungetch(ch);
                         tNextCur_us = tNow_us;
                         wtimeout(stdscr, 1);
