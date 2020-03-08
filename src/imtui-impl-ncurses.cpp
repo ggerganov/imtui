@@ -172,6 +172,7 @@ bool ImTui_ImplNcurses_NewFrame() {
     std::fill(keysDown, keysDown + 512, 0);
 
     ImGui::GetIO().KeyCtrl = false;
+    ImGui::GetIO().KeyShift = false;
 
     while (true) {
         int c = wgetch(stdscr);
@@ -203,6 +204,19 @@ bool ImTui_ImplNcurses_NewFrame() {
             }
             if (c == KEY_BACKSPACE || c == KEY_DC || c == 127) {
                 ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Backspace]] = true;
+            // Shift + arrows (probably not portable :()
+            } else if (c == 393) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]] = true;
+                ImGui::GetIO().KeyShift = true;
+            } else if (c == 402) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_RightArrow]] = true;
+                ImGui::GetIO().KeyShift = true;
+            } else if (c == 337) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_UpArrow]] = true;
+                ImGui::GetIO().KeyShift = true;
+            } else if (c == 336) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_DownArrow]] = true;
+                ImGui::GetIO().KeyShift = true;
             } else {
                 keysDown[c] = true;
             }
