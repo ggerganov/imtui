@@ -229,10 +229,6 @@ extern "C" {
                     }
                     wSize.x = int(wSize.x);
                     ImGui::SetNextWindowPos(ImVec2(wSize.x*windowId, 0), ImGuiCond_Always);
-
-                    if (windowId < stateUI.nWindows - 1) {
-                        wSize.x -= 1.1;
-                    }
                     ImGui::SetNextWindowSize(wSize, ImGuiCond_Always);
                 }
 
@@ -632,7 +628,7 @@ extern "C" {
 #endif
                 ImGui::Text(" ");
                 ImGui::Text("Interactive browsing of https://news.ycombinator.com/");
-                ImGui::Text("Content is automatically updated - no need to refresh ");
+                ImGui::Text("Content is automatically updated - no need to refresh  ");
                 ImGui::Text(" ");
                 ImGui::Text("    h/H         - toggle Help window    ");
                 ImGui::Text("    s           - toggle Status window    ");
