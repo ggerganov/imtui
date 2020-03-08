@@ -39,7 +39,8 @@ namespace {
             wtimeout(stdscr, 0);
             while (tNow_us < tNextCur_us - 100) {
                 if (tNow_us + 0.5*tStepActive_us < tNextCur_us) {
-		    int ch = wgetch(stdscr);
+                    int ch = wgetch(stdscr);
+
                     if (ch != ERR) {
                         ungetch(ch);
                         tNextCur_us = tNow_us;
@@ -92,13 +93,16 @@ ImTui::TScreen * ImTui_ImplNcurses_Init(bool mouseSupport, float fps_active, flo
     noecho();
     curs_set(0);
     nodelay(stdscr, TRUE);
-    keypad(stdscr, TRUE);
     wtimeout(stdscr, 1);
+    set_escdelay(25);
 
     if (mouseSupport) {
+        keypad(stdscr, true);
         mouseinterval(0);
         mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
         printf("\033[?1003h\n");
+    } else {
+        keypad(stdscr, false);
     }
 
     ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
