@@ -8,8 +8,6 @@
 
 #include <emscripten.h>
 
-#include <string>
-
 // client input
 static bool ignoreMouse = false;
 static ImVec2 lastMousePos = { 0.0, 0.0 };
@@ -18,7 +16,7 @@ static float lastMouseWheel = 0.0;
 static float lastMouseWheelH = 0.0;
 
 static ImTui::TScreen * g_screen = nullptr;
-static std::string lastAddText = "";
+static char lastAddText[8];
 static bool lastKeysDown[512];
 
 ImTui::TScreen * ImTui_ImplEmscripten_Init(bool mouseSupport) {
@@ -72,8 +70,8 @@ void ImTui_ImplEmscripten_NewFrame() {
     ImGui::GetIO().MouseDown[3] = lastMouseDown[3];
     ImGui::GetIO().MouseDown[4] = lastMouseDown[4];
 
-    if (lastAddText.size() > 0) {
-        ImGui::GetIO().AddInputCharactersUTF8(lastAddText.c_str());
+    if (strlen(lastAddText) > 0 && (!(lastAddText[0] & 0x80)) ) {
+        ImGui::GetIO().AddInputCharactersUTF8(lastAddText);
     }
 
     for (int i = 0; i < 512; ++i) {
@@ -82,7 +80,7 @@ void ImTui_ImplEmscripten_NewFrame() {
 
     lastMouseWheelH = 0.0;
     lastMouseWheel = 0.0;
-    lastAddText = "";
+    lastAddText[0] = 0;
 }
 
 EMSCRIPTEN_KEEPALIVE
@@ -137,10 +135,8 @@ void get_screen(char * buffer) {
 
 EMSCRIPTEN_KEEPALIVE
 void set_key_down(int key) {
-    lastAddText.resize(1);
-    if (ImGui::GetIO().KeyShift == false && key >= 'A' && key <= 'Z') {
-        key += 'a' - 'A';
-    }
+    lastAddText[0] = 0;
+    lastAddText[1] = 0;
 
     if (lastKeysDown[17]) {
         (key == 65) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_A]] = true);
@@ -150,7 +146,16 @@ void set_key_down(int key) {
         (key == 89) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Y]] = true);
         (key == 90) && (lastKeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Z]] = true);
     } else {
-        lastAddText[0] = key;
+        bool isSpecial = false;
+        for (int i = 0; i < ImGuiKey_COUNT; ++i) {
+            if (key == ImGui::GetIO().KeyMap[i]) {
+                isSpecial = true;
+                break;
+            }
+        }
+        if (isSpecial == false) {
+            lastAddText[0] = key;
+        }
     }
 
     lastKeysDown[key] = true;
@@ -170,10 +175,6 @@ void set_key_down(int key) {
 
 EMSCRIPTEN_KEEPALIVE
 void set_key_up(int key) {
-    if (ImGui::GetIO().KeyShift == false && key >= 'A' && key <= 'Z') {
-        key += 'a' - 'A';
-    }
-
     lastKeysDown[key] = false;
 
     if (key == 16) {
@@ -197,13 +198,9 @@ void set_key_up(int key) {
 
 EMSCRIPTEN_KEEPALIVE
 void set_key_press(int key) {
-    if (ImGui::GetIO().KeyShift == false && key >= 'A' && key <= 'Z') {
-        key += 'a' - 'A';
-    }
-
     if (key > 0) {
-        lastAddText.resize(1);
         lastAddText[0] = key;
+        lastAddText[1] = 0;
     }
 }
 

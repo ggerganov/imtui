@@ -37,8 +37,15 @@
             var charSizeX = document.getElementById('single-char').getBoundingClientRect().width;
             var charSizeY = document.getElementById('single-char').getBoundingClientRect().height;
 
+            function toChar(event) {
+                if (event.key.length == 1) {
+                    return event.key.charCodeAt(0);
+                }
+                return event.keyCode;
+            }
+
             function onkeyup(event) {
-                Module._set_key_up(event.keyCode);
+                Module._set_key_up(toChar(event));
 
                 if (event.keyCode >= 112 && event.keyCode <= 123) {
                 } else {
@@ -48,7 +55,7 @@
 
             function onkeydown(event) {
                 //console.log(event);
-                Module._set_key_down(event.keyCode);
+                Module._set_key_down(toChar(event));
 
                 if (event.keyCode >= 112 && event.keyCode <= 123) {
                 } else {
@@ -57,7 +64,7 @@
             }
 
             function onkeypress(event) {
-                Module._set_key_press(event.keyCode);
+                Module._set_key_press(toChar(event));
 
                 if (event.keyCode >= 112 && event.keyCode <= 123) {
                 } else {
