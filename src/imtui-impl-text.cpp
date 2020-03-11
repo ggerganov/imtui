@@ -121,16 +121,16 @@ inline ImTui::TColor rgbToAnsi256(ImU32 col, bool doAlpha) {
 
     if (doAlpha) {
         ImTui::TColor a = (col & 0xFF000000) >> 24;
-        float scale = float(a)/255;
+        float scale = float(a)/255.0f;
         r = std::round(r*scale);
         g = std::round(g*scale);
         b = std::round(b*scale);
     }
 
     ImTui::TColor res = 16
-        + (36 * std::round((float(r) / 255) * 5))
-        + (6 * std::round((float(g) / 255) * 5))
-        + std::round((float(b) / 255) * 5);
+        + (36 * std::round((float(r) / 255.0f) * 5.0f))
+        + (6 * std::round((float(g) / 255.0f) * 5.0f))
+        + std::round((float(b) / 255.0f) * 5.0f);
 
     return res;
 }
