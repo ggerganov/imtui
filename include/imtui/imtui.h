@@ -31,6 +31,10 @@ struct TScreen {
 
     TCell * data = nullptr;
 
+    ~TScreen() {
+        if (data) delete [] data;
+    }
+
     inline int size() const { return nx*ny; }
 
     inline void clear() {
