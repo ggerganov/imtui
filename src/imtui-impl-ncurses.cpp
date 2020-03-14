@@ -200,7 +200,9 @@ bool ImTui_ImplNcurses_NewFrame() {
             input[0] = (c & 0x000000FF);
             input[1] = (c & 0x0000FF00) >> 8;
             if (c < 128) {
-                ImGui::GetIO().AddInputCharactersUTF8(input);
+                if (c != ImGui::GetIO().KeyMap[ImGuiKey_Enter]) {
+                    ImGui::GetIO().AddInputCharactersUTF8(input);
+                }
             }
             if (c == KEY_BACKSPACE || c == KEY_DC || c == 127) {
                 ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Backspace]] = true;

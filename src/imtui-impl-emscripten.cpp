@@ -148,7 +148,7 @@ void set_key_down(int key) {
     } else {
         bool isSpecial = false;
         for (int i = 0; i < ImGuiKey_COUNT; ++i) {
-            if (key == ImGui::GetIO().KeyMap[i]) {
+            if (key == ImGui::GetIO().KeyMap[i] && key != ImGui::GetIO().KeyMap[ImGuiKey_Space]) {
                 isSpecial = true;
                 break;
             }
