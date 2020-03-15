@@ -200,7 +200,7 @@ bool ImTui_ImplNcurses_NewFrame() {
             input[0] = (c & 0x000000FF);
             input[1] = (c & 0x0000FF00) >> 8;
             //printf("c = %d, c0 = %d, c1 = %d xxx\n", c, input[0], input[1]);
-            if (c < 128) {
+            if (c < 127) {
                 if (c != ImGui::GetIO().KeyMap[ImGuiKey_Enter]) {
                     ImGui::GetIO().AddInputCharactersUTF8(input);
                 }
