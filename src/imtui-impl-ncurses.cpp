@@ -199,12 +199,15 @@ bool ImTui_ImplNcurses_NewFrame() {
         } else {
             input[0] = (c & 0x000000FF);
             input[1] = (c & 0x0000FF00) >> 8;
+            //printf("c = %d, c0 = %d, c1 = %d xxx\n", c, input[0], input[1]);
             if (c < 128) {
                 if (c != ImGui::GetIO().KeyMap[ImGuiKey_Enter]) {
                     ImGui::GetIO().AddInputCharactersUTF8(input);
                 }
             }
-            if (c == KEY_BACKSPACE || c == KEY_DC || c == 127) {
+            if (c == 330) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Delete]] = true;
+            } else if (c == KEY_BACKSPACE || c == KEY_DC || c == 127) {
                 ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Backspace]] = true;
             // Shift + arrows (probably not portable :()
             } else if (c == 393) {
