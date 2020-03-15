@@ -10,6 +10,8 @@ ImTui is an immediate mode text-based user interface library. Supports 256 ANSI 
 
 <a href="https://i.imgur.com/IQNIIbB.png" target="_blank">![imtui-screenshot-1](https://i.imgur.com/IQNIIbB.png)</a>
 
+[![wtf-tui-demo](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8.svg)](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8)
+
 ## Live demo in the browser
 
 Eventhough this library is supposed to be used in the terminal, for convenience here is an [Emscripten](https://emscripten.org) build to demonstrate what it would look like, by simulating a console in the browser:
@@ -28,6 +30,7 @@ For basic usage of ImTui, check one of the available samples:
 - [example-ncurses0](https://github.com/ggerganov/imtui/blob/master/examples/ncurses0/main.cpp)
 - [example-emscripten0](https://github.com/ggerganov/imtui/blob/master/examples/emscripten0/main.cpp)
 - [hnterm](https://github.com/ggerganov/hnterm) - a simple tool to browse Hacker News in the terminal
+- [wtf-tui](https://github.com/ggerganov/wtf-tui) - text-based UI for configuring the WTF terminal dashboard
 
 *Note: the current implementation is experimental, so don't expect all things to work.*
 
