@@ -18,6 +18,7 @@ Eventhough this library is supposed to be used in the terminal, for convenience 
 
 - Demo 0: [imtui.ggerganov.com](https://imtui.ggerganov.com/) 
 - Demo 1: [hnterm.ggerganov.com](https://hnterm.ggerganov.com/)
+- Demo 2: [wtf-tui.ggerganov.com](https://wtf-tui.ggerganov.com/)
 
 Note: the demos work best with **Chrome**
 
