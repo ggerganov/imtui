@@ -153,6 +153,11 @@ void set_key_down(int key) {
                 break;
             }
         }
+
+        if (key == 189) { // minus '-' sign
+            key = 45;
+        }
+
         if (isSpecial == false) {
             lastAddText[0] = key;
         }
