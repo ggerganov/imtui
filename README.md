@@ -6,11 +6,11 @@ ImTui is an immediate mode text-based user interface library. Supports 256 ANSI 
 
 [![imtui-sample](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU.svg)](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU)
 
+[![wtf-tui-demo](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8.svg)](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8)
+
 <a href="https://i.imgur.com/4370FJt.png" target="_blank">![imtui-screenshot-0](https://i.imgur.com/4370FJt.png)</a>
 
 <a href="https://i.imgur.com/IQNIIbB.png" target="_blank">![imtui-screenshot-1](https://i.imgur.com/IQNIIbB.png)</a>
-
-[![wtf-tui-demo](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8.svg)](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8)
 
 ## Live demo in the browser
 
