@@ -141,6 +141,9 @@ ImTui::TScreen * ImTui_ImplNcurses_Init(bool mouseSupport, float fps_active, flo
 }
 
 void ImTui_ImplNcurses_Shutdown() {
+    // ref #11 : https://github.com/ggerganov/imtui/issues/11
+    printf("\033[?1003l\n"); // Disable mouse movement events, as l = low
+
     endwin();
 
     if (g_screen) {
