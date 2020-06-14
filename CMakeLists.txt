@@ -60,6 +60,16 @@ endif()
 
 if (IMTUI_SUPPORT_NCURSES)
     find_package(Curses REQUIRED)
+    CHECK_LIBRARY_EXISTS("${CURSES_NCURSES_LIBRARY}"
+                         nodelay "" CURSES_NCURSES_HAS_NODELAY)
+    if(NOT CURSES_NCURSES_HAS_NODELAY)
+            find_library(CURSES_EXTRA_LIBRARY tinfo)
+            CHECK_LIBRARY_EXISTS("${CURSES_EXTRA_LIBRARY}"
+                                    nodelay "" CURSES_TINFO_HAS_NODELAY)
+    endif()
+    if(CURSES_EXTRA_LIBRARY)
+            set(CURSES_LIBRARIES ${CURSES_LIBRARIES} ${CURSES_EXTRA_LIBRARY})
+    endif()
 endif()
 
 # main
