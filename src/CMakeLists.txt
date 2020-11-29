@@ -9,7 +9,7 @@ target_include_directories(imtui-core PUBLIC
     )
 
 target_link_libraries(imtui-core PUBLIC
-    imgui
+    imgui-for-imtui
     )
 
 target_link_libraries(imtui-core PRIVATE

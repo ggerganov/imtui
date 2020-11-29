@@ -12,21 +12,21 @@ else (APPLE)
     unset(ADDITIONAL_LIBRARIES)
 endif (APPLE)
 
-add_library(imgui ${IMTUI_LIBRARY_TYPE}
+add_library(imgui-for-imtui ${IMTUI_LIBRARY_TYPE}
     imgui/imgui/imgui.cpp
     imgui/imgui/imgui_draw.cpp
     imgui/imgui/imgui_demo.cpp
     imgui/imgui/imgui_widgets.cpp
     )
 
-target_include_directories(imgui INTERFACE
+target_include_directories(imgui-for-imtui INTERFACE
     imgui
     )
 
-target_include_directories(imgui PRIVATE
+target_include_directories(imgui-for-imtui PRIVATE
     imgui/imgui
     )
 
-target_link_libraries(imgui PRIVATE
+target_link_libraries(imgui-for-imtui PRIVATE
     ${ADDITIONAL_LIBRARIES}
     )
