@@ -16,7 +16,7 @@ jobs:
                   submodules: true
 
             - name: Dependencies
-              run: sudo apt-get install libncurses5-dev libcurl4-openssl-dev
+              run: sudo apt-get update && sudo apt-get install libncurses5-dev libcurl4-openssl-dev
 
             - name: Configure
               run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.build }}
@@ -38,7 +38,7 @@ jobs:
                   submodules: true
 
             - name: Dependencies
-              run: sudo apt-get install libncurses5-dev libcurl4-openssl-dev
+              run: sudo apt-get update && sudo apt-get install libncurses5-dev libcurl4-openssl-dev
 
             - name: Configure
               run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.build }} -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
