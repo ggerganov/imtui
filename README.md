@@ -4,7 +4,7 @@ imtui
 
 ImTui is an immediate mode text-based user interface library. Supports 256 ANSI colors and mouse/keyboard input. 
 
-[![imtui-sample](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU.svg)](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU)
+[![imtui-sample](https://media.giphy.com/media/AcKDr9ZyW3RWyNZRg1/giphy.gif)](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU)
 
 [![wtf-tui-demo](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8.svg)](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8)
 
