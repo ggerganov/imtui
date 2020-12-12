@@ -95,14 +95,12 @@ ImTui::TScreen * ImTui_ImplNcurses_Init(bool mouseSupport, float fps_active, flo
     nodelay(stdscr, TRUE);
     wtimeout(stdscr, 1);
     set_escdelay(25);
+    keypad(stdscr, true);
 
     if (mouseSupport) {
-        keypad(stdscr, true);
         mouseinterval(0);
         mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
         printf("\033[?1003h\n");
-    } else {
-        keypad(stdscr, false);
     }
 
     ImGui::GetIO().KeyMap[ImGuiKey_Tab]         = 9;
