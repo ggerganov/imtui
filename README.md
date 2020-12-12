@@ -1,6 +1,7 @@
 imtui 
 =====
 [![Actions Status](https://github.com/ggerganov/imtui/workflows/CI/badge.svg)](https://github.com/ggerganov/imtui/actions)
+[![Dear ImGui version badge][imgui-version-badge]](https://github.com/ocornut/imgui)
 
 ImTui is an immediate mode text-based user interface library. Supports 256 ANSI colors and mouse/keyboard input. 
 
@@ -60,3 +61,5 @@ mkdir build && cd build
 emconfigure cmake ..
 make
 ```
+
+[imgui-version-badge]: https://img.shields.io/badge/Powered%20by%20Dear%20ImGui%20v1.77-blue.svg
