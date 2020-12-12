@@ -358,8 +358,7 @@ void ImTui_ImplNcurses_DrawScreen(bool active) {
             if (nRandom[y*nx + x] > 0) {
                 if (nRandom[y*nx + x] == 1) {
                     --nRandom[y*nx + x];
-                } else if (rand()%100 < 75) {
-                //} else if (x < 3 || (nRandom[y*nx + x - 1] == 0 && nRandom[y*nx + x - 2] == 0 && nRandom[y*nx + x - 3] == 0)) {
+                } else if ((rand()%100 < 10) || (x < 3 || (nRandom[y*nx + x - 1] == 0 && nRandom[y*nx + x - 2] == 0 && nRandom[y*nx + x - 3] == 0))) {
                     --nRandom[y*nx + x];
                     c = 33 + rand()%65;
                     ++nR;
