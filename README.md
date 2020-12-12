@@ -62,4 +62,4 @@ emconfigure cmake ..
 make
 ```
 
-[imgui-version-badge]: https://img.shields.io/badge/Powered%20by%20Dear%20ImGui%20v1.77-blue.svg
+[imgui-version-badge]: https://img.shields.io/badge/Powered%20by%20Dear%20ImGui-v1.77-blue.svg
