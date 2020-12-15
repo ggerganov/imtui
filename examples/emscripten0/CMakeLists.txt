@@ -9,7 +9,7 @@ target_include_directories(${TARGET} PRIVATE
     )
 
 target_link_libraries(${TARGET} PRIVATE
-    imtui-core
+    imtui
     imtui-examples-common
     imtui-emscripten
     )

@@ -5,7 +5,7 @@ add_library(imtui-examples-common ${IMTUI_LIBRARY_TYPE}
     )
 
 target_link_libraries(imtui-examples-common PRIVATE
-    imtui-core
+    imtui
     )
 
 if (EMSCRIPTEN)

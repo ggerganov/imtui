@@ -12,7 +12,7 @@ else (APPLE)
     unset(ADDITIONAL_LIBRARIES)
 endif (APPLE)
 
-add_library(imgui-for-imtui ${IMTUI_LIBRARY_TYPE}
+add_library(imgui-for-imtui STATIC
     imgui/imgui/imgui.cpp
     imgui/imgui/imgui_draw.cpp
     imgui/imgui/imgui_demo.cpp
@@ -30,3 +30,5 @@ target_include_directories(imgui-for-imtui PRIVATE
 target_link_libraries(imgui-for-imtui PRIVATE
     ${ADDITIONAL_LIBRARIES}
     )
+
+set_property(TARGET imgui-for-imtui PROPERTY POSITION_INDEPENDENT_CODE ON)

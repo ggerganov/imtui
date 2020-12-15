@@ -1,20 +1,22 @@
 # core
 
-add_library(imtui-core ${IMTUI_LIBRARY_TYPE}
+add_library(imtui ${IMTUI_LIBRARY_TYPE}
     imtui-impl-text.cpp
     )
 
-target_include_directories(imtui-core PUBLIC
+target_include_directories(imtui PUBLIC
     ../include
     )
 
-target_link_libraries(imtui-core PUBLIC
+target_link_libraries(imtui PUBLIC
     imgui-for-imtui
     )
 
-target_link_libraries(imtui-core PRIVATE
+target_link_libraries(imtui PRIVATE
     ${CMAKE_DL_LIBS}
     )
+
+set_target_properties(imtui PROPERTIES PUBLIC_HEADER "include/imtui/imtui.h;include/imtui/imtui-impl-text.h")
 
 # ncurses
 
@@ -23,12 +25,14 @@ if (IMTUI_SUPPORT_NCURSES)
         imtui-impl-ncurses.cpp
         )
 
-    target_include_directories(imtui-core PUBLIC
+    target_include_directories(imtui-ncurses PRIVATE
         ${CURSES_INCLUDE_DIR}
         )
 
+    set_target_properties(imtui-ncurses PROPERTIES PUBLIC_HEADER "include/imtui/imtui-impl-ncurses.h")
+
     target_link_libraries(imtui-ncurses PUBLIC
-        imtui-core
+        imtui
         ${CURSES_LIBRARIES}
         )
 endif()
@@ -41,6 +45,6 @@ if (EMSCRIPTEN)
         )
 
     target_link_libraries(imtui-emscripten PUBLIC
-        imtui-core
+        imtui
         )
 endif()
