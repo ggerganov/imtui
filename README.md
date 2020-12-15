@@ -1,9 +1,10 @@
-imtui 
+imtui
 =====
 [![Actions Status](https://github.com/ggerganov/imtui/workflows/CI/badge.svg)](https://github.com/ggerganov/imtui/actions)
+[![ImTui v1.0.0 badge][changelog-badge]][changelog]
 [![Dear ImGui version badge][imgui-version-badge]](https://github.com/ocornut/imgui)
 
-ImTui is an immediate mode text-based user interface library. Supports 256 ANSI colors and mouse/keyboard input. 
+ImTui is an immediate mode text-based user interface library. Supports 256 ANSI colors and mouse/keyboard input.
 
 [![imtui-sample](https://media.giphy.com/media/AcKDr9ZyW3RWyNZRg1/giphy.gif)](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU)
 
@@ -17,7 +18,7 @@ ImTui is an immediate mode text-based user interface library. Supports 256 ANSI 
 
 Eventhough this library is supposed to be used in the terminal, for convenience here is an [Emscripten](https://emscripten.org) build to demonstrate what it looks like, by simulating a console in the browser:
 
-- Demo 0: [imtui.ggerganov.com](https://imtui.ggerganov.com/) 
+- Demo 0: [imtui.ggerganov.com](https://imtui.ggerganov.com/)
 - Demo 1: [hnterm.ggerganov.com](https://hnterm.ggerganov.com/)
 - Demo 2: [wtf-tui.ggerganov.com](https://wtf-tui.ggerganov.com/)
 
@@ -33,8 +34,6 @@ For basic usage of ImTui, check one of the available samples:
 - [example-emscripten0](https://github.com/ggerganov/imtui/blob/master/examples/emscripten0/main.cpp)
 - [hnterm](https://github.com/ggerganov/hnterm) - a simple tool to browse Hacker News in the terminal
 - [wtf-tui](https://github.com/ggerganov/wtf-tui) - text-based UI for configuring the WTF terminal dashboard
-
-*Note: the current implementation is experimental, so don't expect all things to work.*
 
 ## Building
 
@@ -62,4 +61,6 @@ emconfigure cmake ..
 make
 ```
 
+[changelog]: ./CHANGELOG.md
+[changelog-badge]: https://img.shields.io/badge/changelog-ImTui%20v1.0.0-dummy
 [imgui-version-badge]: https://img.shields.io/badge/Powered%20by%20Dear%20ImGui-v1.77-blue.svg
