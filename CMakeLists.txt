@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.10)
-project(imtui)
+project(imtui VERSION 1.0.0)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "on")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -97,3 +97,12 @@ add_subdirectory(src)
 if (IMTUI_STANDALONE AND IMTUI_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
+
+include(GNUInstallDirs)
+install(TARGETS imtui-ncurses
+    EXPORT imtui-ncurses
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
