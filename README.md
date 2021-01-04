@@ -51,6 +51,26 @@ make
 ./bin/imtui-example-ncurses0
 ```
 
+### Windows:
+
+Partial Windows support is currently available using MSYS2 + MinGW + PDCurses:
+
+```
+# install required packages in an MSYS2 terminal:
+pacman -S git cmake make mingw-w64-x86_64-dlfcn mingw-w64-x86_64-gcc mingw-w64-x86_64-pdcurses mingw-w64-x86_64-curl
+
+# build
+git clone https://github.com/ggerganov/imtui --recursive
+cd imtui
+mkdir build && cd build
+cmake ..
+make
+
+./bin/hnterm.exe
+```
+![](https://user-images.githubusercontent.com/1991296/103576542-fa5aef80-4edb-11eb-8340-4bd60a1f9fba.gif)
+For more information, checkout the following discussion: [#19](https://github.com/ggerganov/imtui/discussions/19)
+
 ### Emscripten:
 
 ```bash
