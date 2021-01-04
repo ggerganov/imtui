@@ -18,6 +18,10 @@ target_link_libraries(imtui PRIVATE
 
 set_target_properties(imtui PROPERTIES PUBLIC_HEADER "include/imtui/imtui.h;include/imtui/imtui-impl-text.h")
 
+if (MINGW)
+    target_link_libraries(imtui PUBLIC stdc++)
+endif()
+
 # ncurses
 
 if (IMTUI_SUPPORT_NCURSES)

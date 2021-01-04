@@ -32,3 +32,7 @@ target_link_libraries(imgui-for-imtui PRIVATE
     )
 
 set_property(TARGET imgui-for-imtui PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+if (MINGW)
+    set_target_properties(imgui-for-imtui PROPERTIES COMPILE_FLAGS -fno-threadsafe-statics)
+endif()

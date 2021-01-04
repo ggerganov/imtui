@@ -6,7 +6,26 @@
 #include "imtui/imtui-impl-ncurses.h"
 #include "imtui/imtui-impl-text.h"
 
+#ifdef _WIN32
+#define NCURSES_MOUSE_VERSION
+#include <pdcurses.h>
+#define set_escdelay(X)
+
+#define KEY_OFFSET 0xec00
+
+#define KEY_CODE_YES     (KEY_OFFSET + 0x00) /* If get_wch() gives a key code */
+
+#define KEY_BREAK        (KEY_OFFSET + 0x01) /* Not on PC KBD */
+#define KEY_DOWN         (KEY_OFFSET + 0x02) /* Down arrow key */
+#define KEY_UP           (KEY_OFFSET + 0x03) /* Up arrow key */
+#define KEY_LEFT         (KEY_OFFSET + 0x04) /* Left arrow key */
+#define KEY_RIGHT        (KEY_OFFSET + 0x05) /* Right arrow key */
+#define KEY_HOME         (KEY_OFFSET + 0x06) /* home key */
+#define KEY_BACKSPACE    (8) /* not on pc */
+#define KEY_F0           (KEY_OFFSET + 0x08) /* function keys; 64 reserved */
+#else
 #include <ncurses.h>
+#endif
 
 #include <array>
 #include <chrono>
@@ -223,6 +242,16 @@ bool ImTui_ImplNcurses_NewFrame() {
             } else if (c == 336) {
                 ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_DownArrow]] = true;
                 ImGui::GetIO().KeyShift = true;
+            } else if (c == KEY_BACKSPACE) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_Backspace]] = true;
+            } else if (c == KEY_LEFT) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow]] = true;
+            } else if (c == KEY_RIGHT) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_RightArrow]] = true;
+            } else if (c == KEY_UP) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_UpArrow]] = true;
+            } else if (c == KEY_DOWN) {
+                ImGui::GetIO().KeysDown[ImGui::GetIO().KeyMap[ImGuiKey_DownArrow]] = true;
             } else {
                 keysDown[c] = true;
             }

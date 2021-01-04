@@ -106,6 +106,7 @@ static void addTransfer(CURLM *cm, int idx, std::string && uri) {
 }
 
 bool hnInit() {
+#ifndef _WIN32
     struct sigaction sh;
     struct sigaction osh;
 
@@ -119,6 +120,7 @@ bool hnInit() {
     if (sigaction(SIGPIPE, &sh, &osh) < 0) {
         return false;
     }
+#endif
 
     curl_global_init(CURL_GLOBAL_ALL);
     g_cm = curl_multi_init();
