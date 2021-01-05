@@ -229,6 +229,10 @@ extern "C" {
                     }
                     wSize.x = int(wSize.x);
                     ImGui::SetNextWindowPos(ImVec2(wSize.x*windowId, 0), ImGuiCond_Always);
+
+                    if (windowId < stateUI.nWindows - 1) {
+                        wSize.x -= 1.1;
+                    }
                     ImGui::SetNextWindowSize(wSize, ImGuiCond_Always);
                 }
 
@@ -265,17 +269,30 @@ extern "C" {
                         if (std::holds_alternative<HN::Story>(item.data)) {
                             const HN::Story & story = std::get<HN::Story>(item.data);
 
+                            auto p0 = ImGui::GetCursorScreenPos();
+
+                            // draw text to be able to calculate the final text size
+                            ImGui::PushTextWrapPos(ImGui::GetContentRegionAvailWidth());
+                            ImGui::Text("%2d.", i + 1);
+                            ImGui::SameLine();
+                            ImGui::Text("%s", story.title.c_str());
+
+                            // draw hovered story highlight
                             if (windowId == stateUI.hoveredWindowId && i == window.hoveredStoryId) {
                                 auto col0 = ImGui::GetStyleColorVec4(ImGuiCol_Text);
                                 auto col1 = ImGui::GetStyleColorVec4(ImGuiCol_WindowBg);
                                 ImGui::PushStyleColor(ImGuiCol_Text, col1);
                                 ImGui::PushStyleColor(ImGuiCol_TextDisabled, col0);
 
-                                auto p0 = ImGui::GetCursorScreenPos();
-                                p0.x += 1;
-                                auto p1 = p0;
-                                p1.x += ImGui::CalcTextSize(story.title.c_str()).x + 4;
+                                auto p1 = ImGui::GetCursorScreenPos();
+                                p1.y -= 1;
+                                if (p1.y > p0.y) {
+                                    p1.x += ImGui::GetContentRegionAvailWidth() - 1;
+                                } else {
+                                    p1.x += ImGui::CalcTextSize(story.title.c_str()).x + 5;
+                                }
 
+                                // highlight rectangle
                                 ImGui::GetWindowDrawList()->AddRectFilled(p0, p1, ImGui::GetColorU32(col0));
 
                                 if (ImGui::IsKeyPressed('o', false) || ImGui::IsKeyPressed('O', false)) {
@@ -283,12 +300,15 @@ extern "C" {
                                 }
                             }
 
+                            // go back to original position and redraw text over the highlight
+                            ImGui::SetCursorScreenPos(p0);
+
                             ImGui::Text("%2d.", i + 1);
                             isHovered |= ImGui::IsItemHovered();
                             ImGui::SameLine();
-                            ImGui::PushTextWrapPos(ImGui::GetContentRegionAvailWidth());
                             ImGui::Text("%s", story.title.c_str());
                             isHovered |= ImGui::IsItemHovered();
+
                             ImGui::PopTextWrapPos();
                             ImGui::SameLine();
 
@@ -366,13 +386,13 @@ extern "C" {
                     if (windowId == stateUI.hoveredWindowId) {
                         if (ImGui::IsMouseDoubleClicked(0) ||
                             ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Enter], false)) {
-                            if (stateUI.showHelpModal == false) {
+                            if (stateUI.showHelpModal == false && window.hoveredStoryId < (int) storyIds.size()) {
                                 window.showComments = true;
                                 window.selectedStoryId = storyIds[window.hoveredStoryId];
                             }
                         }
 
-                        if (ImGui::IsKeyPressed('r', false)) {
+                        if (ImGui::IsKeyPressed('r', false) && window.hoveredStoryId < (int) storyIds.size()) {
                             toUpdate.push_back(storyIds[window.hoveredStoryId]);
                         }
 
@@ -383,7 +403,7 @@ extern "C" {
 
                         if (ImGui::IsKeyPressed('j', true) ||
                             ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_DownArrow], true)) {
-                            window.hoveredStoryId = std::min(nShow - 1, window.hoveredStoryId + 1);
+                            window.hoveredStoryId = std::max(0, std::min(nShow - 1, window.hoveredStoryId + 1));
                         }
 
                         if (ImGui::IsKeyPressed('g', true)) {
@@ -576,7 +596,7 @@ extern "C" {
                              ImGuiWindowFlags_NoMove);
                 ImGui::Text(" API requests     : %d / %d B (next update in %d s)", stateHN.nFetches, (int) stateHN.totalBytesDownloaded, stateHN.nextUpdate);
                 ImGui::Text(" Last API request : %s", stateHN.curURI);
-                ImGui::Text(" Source code      : https://github.com/ggerganov/imtui/tree/master/examples/hnterm");
+                ImGui::Text(" Source code      : https://github.com/ggerganov/hnterm");
                 ImGui::End();
             }
 
@@ -618,7 +638,7 @@ extern "C" {
                 ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = col;
             }
 
-            if (ImGui::BeginPopupModal("HNTerm v0.1###Help", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            if (ImGui::BeginPopupModal("HNTerm v0.3###Help", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
 #ifdef __EMSCRIPTEN__
                 ImGui::Text(" ");
                 ImGui::Text("---------------------------------------------");
@@ -628,7 +648,7 @@ extern "C" {
 #endif
                 ImGui::Text(" ");
                 ImGui::Text("Interactive browsing of https://news.ycombinator.com/");
-                ImGui::Text("Content is automatically updated - no need to refresh  ");
+                ImGui::Text("Content is automatically updated - no need to refresh ");
                 ImGui::Text(" ");
                 ImGui::Text("    h/H         - toggle Help window    ");
                 ImGui::Text("    s           - toggle Status window    ");
@@ -684,7 +704,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char ** argv) {
     auto argm = parseCmdArguments(argc, argv);
     int mouseSupport = argm.find("--mouse") != argm.end() || argm.find("m") != argm.end();
     if (argm.find("--help") != argm.end() || argm.find("-h") != argm.end()) {
-        printf("Usage: %s [-m] [-h]\n", argv[0]);
+        printf("Usage: hnterm [-m] [-h]\n");
         printf("    -m, --mouse : ncurses mouse support\n");
         printf("    -h, --help  : print this help\n");
         return -1;
