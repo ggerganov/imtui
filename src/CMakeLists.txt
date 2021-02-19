@@ -16,7 +16,7 @@ target_link_libraries(imtui PRIVATE
     ${CMAKE_DL_LIBS}
     )
 
-set_target_properties(imtui PROPERTIES PUBLIC_HEADER "include/imtui/imtui.h;include/imtui/imtui-impl-text.h")
+set_target_properties(imtui PROPERTIES PUBLIC_HEADER "../include/imtui/imtui.h;../include/imtui/imtui-impl-text.h")
 
 if (MINGW)
     target_link_libraries(imtui PUBLIC stdc++)
@@ -33,7 +33,7 @@ if (IMTUI_SUPPORT_NCURSES)
         ${CURSES_INCLUDE_DIR}
         )
 
-    set_target_properties(imtui-ncurses PROPERTIES PUBLIC_HEADER "include/imtui/imtui-impl-ncurses.h")
+    set_target_properties(imtui-ncurses PROPERTIES PUBLIC_HEADER "../include/imtui/imtui-impl-ncurses.h")
 
     target_link_libraries(imtui-ncurses PUBLIC
         imtui
@@ -50,5 +50,25 @@ if (EMSCRIPTEN)
 
     target_link_libraries(imtui-emscripten PUBLIC
         imtui
+        )
+endif()
+
+if (IMTUI_STANDALONE AND NOT EMSCRIPTEN)
+    install(TARGETS imtui
+        EXPORT imtui
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
+
+    install(TARGETS imtui-ncurses
+        EXPORT imtui-ncurses
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
 endif()
