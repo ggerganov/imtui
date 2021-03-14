@@ -268,6 +268,7 @@ bool ImTui_ImplText_Init() {
     ImGui::GetStyle().SelectableTextAlign     = ImVec2(0.0f,0.0f);
     ImGui::GetStyle().DisplayWindowPadding    = ImVec2(0,0);
     ImGui::GetStyle().DisplaySafeAreaPadding  = ImVec2(0,0);
+    ImGui::GetStyle().CellPadding             = ImVec2(1,0);
     ImGui::GetStyle().MouseCursorScale        = 1.0f;
     ImGui::GetStyle().AntiAliasedLines        = false;
     ImGui::GetStyle().AntiAliasedFill         = false;
