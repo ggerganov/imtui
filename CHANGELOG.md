@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Update Dear ImGui to v1.81 ([#24](https://github.com/ggerganov/imtui/pull/24))
+
 ## [1.0.3] - 2021-01-09
 
 - Update Dear ImGui to v1.79
