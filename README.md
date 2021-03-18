@@ -83,4 +83,4 @@ make
 
 [changelog]: ./CHANGELOG.md
 [changelog-badge]: https://img.shields.io/badge/changelog-ImTui%20v1.0.3-dummy
-[imgui-version-badge]: https://img.shields.io/badge/Powered%20by%20Dear%20ImGui-v1.79-blue.svg
+[imgui-version-badge]: https://img.shields.io/badge/Powered%20by%20Dear%20ImGui-v1.81-blue.svg
