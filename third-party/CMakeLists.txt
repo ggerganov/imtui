@@ -37,3 +37,12 @@ set_property(TARGET imgui-for-imtui PROPERTY POSITION_INDEPENDENT_CODE ON)
 if (MINGW)
     set_target_properties(imgui-for-imtui PROPERTIES COMPILE_FLAGS -fno-threadsafe-statics)
 endif()
+
+if (IMTUI_STANDALONE AND NOT EMSCRIPTEN)
+    install(
+        FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui/imgui.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui/imconfig.h
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/imgui
+        )
+endif()
