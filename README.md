@@ -1,7 +1,7 @@
 imtui
 =====
 [![Actions Status](https://github.com/ggerganov/imtui/workflows/CI/badge.svg)](https://github.com/ggerganov/imtui/actions)
-[![ImTui v1.0.3 badge][changelog-badge]][changelog]
+[![ImTui v1.0.4 badge][changelog-badge]][changelog]
 [![Dear ImGui version badge][imgui-version-badge]](https://github.com/ocornut/imgui)
 
 ImTui is an immediate mode text-based user interface library. Supports 256 ANSI colors and mouse/keyboard input.
@@ -82,5 +82,5 @@ make
 ```
 
 [changelog]: ./CHANGELOG.md
-[changelog-badge]: https://img.shields.io/badge/changelog-ImTui%20v1.0.3-dummy
+[changelog-badge]: https://img.shields.io/badge/changelog-ImTui%20v1.0.4-dummy
 [imgui-version-badge]: https://img.shields.io/badge/Powered%20by%20Dear%20ImGui-v1.81-blue.svg
