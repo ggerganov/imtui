@@ -41,6 +41,8 @@ option(IMTUI_SUPPORT_CURL            "imtui: support for libcurl" ${IMTUI_SUPPOR
 
 option(IMTUI_BUILD_EXAMPLES          "imtui: build examples" ${IMTUI_STANDALONE})
 
+option(IMTUI_INSTALL_IMGUI_HEADERS   "imtui: install Dear ImGui's header files" ${IMTUI_STANDALONE})
+
 # sanitizers
 
 if (IMTUI_SANITIZE_THREAD)

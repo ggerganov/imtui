@@ -38,7 +38,7 @@ if (MINGW)
     set_target_properties(imgui-for-imtui PROPERTIES COMPILE_FLAGS -fno-threadsafe-statics)
 endif()
 
-if (IMTUI_STANDALONE AND NOT EMSCRIPTEN)
+if (IMTUI_INSTALL_IMGUI_HEADERS AND NOT EMSCRIPTEN)
     install(
         FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui/imgui.h
