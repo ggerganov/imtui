@@ -1,3 +1,6 @@
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(TARGET hnterm)
 
 option(HNTERM_ENABLE_API_CACHE "hnterm: enable API caching" OFF)

@@ -1,3 +1,6 @@
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # core
 
 add_library(imtui ${IMTUI_LIBRARY_TYPE}
