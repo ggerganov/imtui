@@ -21,7 +21,7 @@ int main() {
 
         ImGui::NewFrame();
 
-        ImGui::SetNextWindowPos(ImVec2(4, 2), ImGuiCond_Once);
+        ImGui::SetNextWindowPos(ImVec2(4, 27), ImGuiCond_Once);
         ImGui::SetNextWindowSize(ImVec2(50.0, 10.0), ImGuiCond_Once);
         ImGui::Begin("Hello, world!");
         ImGui::Text("NFrames = %d", nframes++);
@@ -30,6 +30,14 @@ int main() {
         ImGui::Text("Float:");
         ImGui::SameLine();
         ImGui::SliderFloat("##float", &fval, 0.0f, 10.0f);
+
+#ifndef __EMSCRIPTEN__
+        ImGui::Text("%s", "");
+        if (ImGui::Button("Exit program", { ImGui::GetContentRegionAvail().x, 2 })) {
+            break;
+        }
+#endif
+
         ImGui::End();
 
         ImTui::ShowDemoWindow(&demo);
