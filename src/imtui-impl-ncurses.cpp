@@ -278,11 +278,11 @@ bool ImTui_ImplNcurses_NewFrame() {
 }
 
 // state
-int nColPairs = 1;
-int nActiveFrames = 10;
-ImTui::TScreen screenPrev;
-std::vector<uint8_t> curs;
-std::array<std::pair<bool, int>, 256*256> colPairs;
+static int nColPairs = 1;
+static int nActiveFrames = 10;
+static ImTui::TScreen screenPrev;
+static std::vector<uint8_t> curs;
+static std::array<std::pair<bool, int>, 256*256> colPairs;
 
 void ImTui_ImplNcurses_DrawScreen(bool active) {
     if (active) nActiveFrames = 10;

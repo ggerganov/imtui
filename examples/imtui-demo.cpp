@@ -2825,7 +2825,6 @@ static void ShowDemoWindowColumns()
         ImGui::SetNextWindowContentSize(ImVec2(1500.0f, 0.0f));
         ImGui::BeginChild("##ScrollingRegion", ImVec2(0, ImGui::GetFontSize() * 20), false, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::Columns(10);
-        int ITEMS_COUNT = 2000;
         ImGuiListClipper clipper;  // Also demonstrate using the clipper for large list
         while (clipper.Step())
         {
