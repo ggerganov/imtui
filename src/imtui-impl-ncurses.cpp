@@ -55,7 +55,6 @@ namespace {
             auto tStep_us = active ? tStepActive_us : tStepIdle_us;
             auto tNextCur_us = tNext_us + tStep_us;
 
-            wtimeout(stdscr, 0);
             while (tNow_us < tNextCur_us - 100) {
                 if (tNow_us + 0.5*tStepActive_us < tNextCur_us) {
                     int ch = wgetch(stdscr);
@@ -63,7 +62,6 @@ namespace {
                     if (ch != ERR) {
                         ungetch(ch);
                         tNextCur_us = tNow_us;
-                        wtimeout(stdscr, 1);
 
                         return;
                     }
@@ -78,7 +76,6 @@ namespace {
             }
 
             tNext_us += tStep_us;
-            wtimeout(stdscr, 1);
         }
 
         inline float delta_s() {
@@ -112,7 +109,7 @@ ImTui::TScreen * ImTui_ImplNcurses_Init(bool mouseSupport, float fps_active, flo
     noecho();
     curs_set(0);
     nodelay(stdscr, TRUE);
-    wtimeout(stdscr, 1);
+    wtimeout(stdscr, 0);
     set_escdelay(25);
     keypad(stdscr, true);
 
