@@ -327,10 +327,10 @@ void ImTui_ImplNcurses_DrawScreen(bool active) {
         int lastp = 0xFFFFFFFF;
         move(y, 0);
         for (int x = 0; x < nx; ++x) {
-            auto cell = g_screen->data[y*nx + x];
-            uint16_t f = (cell & 0x00FF0000) >> 16;
-            uint16_t b = (cell & 0xFF000000) >> 24;
-            uint16_t p = b*256 + f;
+            const auto cell = g_screen->data[y*nx + x];
+            const uint16_t f = (cell & 0x00FF0000) >> 16;
+            const uint16_t b = (cell & 0xFF000000) >> 24;
+            const uint16_t p = b*256 + f;
 
             if (colPairs[p].first == false) {
                 init_pair(nColPairs, f, b);
@@ -350,8 +350,8 @@ void ImTui_ImplNcurses_DrawScreen(bool active) {
                 lastp = p;
             }
 
-            uint16_t c = cell & 0x0000FFFF;
-            curs[ic++] = c > 0 ? c : '.';
+            const uint16_t c = cell & 0x0000FFFF;
+            curs[ic++] = c > 0 ? c : ' ';
         }
 
         if (curs.size() > 0) {
