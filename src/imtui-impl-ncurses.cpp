@@ -183,6 +183,7 @@ bool ImTui_ImplNcurses_NewFrame() {
     static unsigned long mstate = 0;
     static char input[3];
 
+    int wheel = 0;
     input[2] = 0;
 
     auto & keysDown = ImGui::GetIO().KeysDown;
@@ -203,14 +204,25 @@ bool ImTui_ImplNcurses_NewFrame() {
         } else if (c == KEY_MOUSE) {
             MEVENT event;
             if (getmouse(&event) == OK) {
+                mstate = event.bstate;
+
+                if (mstate == 0x00080000) {
+                    wheel = 1;
+                }
+
+                if (mstate == 0x08000000 && mx == event.x && my == event.y) {
+                    wheel = -1;
+                }
+
                 mx = event.x;
                 my = event.y;
-                mstate = event.bstate;
+
                 if ((mstate & 0x000f) == 0x0002) lbut = 1;
                 if ((mstate & 0x000f) == 0x0001) lbut = 0;
                 if ((mstate & 0xf000) == 0x2000) rbut = 1;
                 if ((mstate & 0xf000) == 0x1000) rbut = 0;
-                //printf("mstate = 0x%016lx\n", mstate);
+
+                //printf("mstate = 0x%016lx id = %d, x = %d, y = %d, z = %d\n", mstate, event.id, event.x, event.y, event.z);
                 ImGui::GetIO().KeyCtrl |= ((mstate & 0x0F000000) == 0x01000000);
             }
         } else {
@@ -266,6 +278,7 @@ bool ImTui_ImplNcurses_NewFrame() {
 
     ImGui::GetIO().MousePos.x = mx;
     ImGui::GetIO().MousePos.y = my;
+    ImGui::GetIO().MouseWheel = wheel;
     ImGui::GetIO().MouseDown[0] = lbut;
     ImGui::GetIO().MouseDown[1] = rbut;
 
