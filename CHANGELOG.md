@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- "Columns & Tables" demo window (0986676)
+- Mouse wheel support for ncurses (35cab31)
+
 ## [1.0.4] - 2021-04-03
 
 - Update Dear ImGui to v1.81 ([#24](https://github.com/ggerganov/imtui/pull/24))
