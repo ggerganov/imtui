@@ -3,7 +3,6 @@
 ## [Unreleased]
 
 - "Columns & Tables" demo window (0986676)
-- Mouse wheel support for ncurses (35cab31)
 
 ## [1.0.4] - 2021-04-03
 
