@@ -97,6 +97,16 @@
                 event.preventDefault();
             }
 
+            function oncontextmenu(event) {
+                if (event.pointerId == 1) {
+                    onpointerdown(event);
+                } else {
+                    onpointerup(event);
+                }
+
+                event.preventDefault();
+            }
+
             function onwheel(event) {
                 let scale = 1.0;
                 switch (event.deltaMode) {
@@ -162,7 +172,7 @@
                 screen.addEventListener('pointerup', onpointerup);
                 screen.addEventListener('mouseup', onpointerup);
 
-                screen.addEventListener('contextmenu', function(event) { event.preventDefault(); });
+                screen.addEventListener('contextmenu', function(event) { oncontextmenu(event); });
                 screen.addEventListener('wheel', onwheel, false);
 
                 screen.addEventListener('touchstart', ontouch);

@@ -65,8 +65,8 @@ void ImTui_ImplEmscripten_NewFrame() {
     ImGui::GetIO().MouseWheelH = lastMouseWheelH;
     ImGui::GetIO().MouseWheel = lastMouseWheel;
     ImGui::GetIO().MouseDown[0] = lastMouseDown[0];
-    ImGui::GetIO().MouseDown[1] = lastMouseDown[1];
-    ImGui::GetIO().MouseDown[2] = lastMouseDown[2];
+    ImGui::GetIO().MouseDown[1] = lastMouseDown[2]; // right-click in browser is 2
+    ImGui::GetIO().MouseDown[2] = lastMouseDown[1]; // scroll-click in browser is 1
     ImGui::GetIO().MouseDown[3] = lastMouseDown[3];
     ImGui::GetIO().MouseDown[4] = lastMouseDown[4];
 
