@@ -11,6 +11,7 @@ body {
     font: sans-serif;
 }
 .no-sel {
+    outline: none;
     -moz-user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
