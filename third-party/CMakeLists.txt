@@ -34,15 +34,19 @@ target_link_libraries(imgui-for-imtui PRIVATE
 
 set_property(TARGET imgui-for-imtui PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+set_target_properties(imgui-for-imtui PROPERTIES PUBLIC_HEADER "imgui/imgui/imgui.h;imgui/imgui/imconfig.h")
+
 if (MINGW)
     set_target_properties(imgui-for-imtui PROPERTIES COMPILE_FLAGS -fno-threadsafe-statics)
 endif()
 
-if (IMTUI_INSTALL_IMGUI_HEADERS AND NOT EMSCRIPTEN)
-    install(
-        FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui/imgui.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/imgui/imgui/imconfig.h
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/imgui
+if (IMTUI_STANDALONE AND NOT EMSCRIPTEN)
+    install(TARGETS imgui-for-imtui
+        EXPORT imgui-for-imtui
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/imgui-for-imtui/imgui
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/imgui-for-imtui/imgui
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
 endif()
