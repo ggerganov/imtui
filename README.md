@@ -6,17 +6,53 @@ imtui
 
 ImTui is an immediate mode text-based user interface library. Supports 256 ANSI colors and mouse/keyboard input.
 
-[![imtui-sample](https://media.giphy.com/media/AcKDr9ZyW3RWyNZRg1/giphy.gif)](https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU)
+<p align="center">
+  <a href="https://asciinema.org/a/JsUQsJyCchqlsQzm1P0CN4OJU">
+    <img alt="ImTui basic" src="https://media.giphy.com/media/AcKDr9ZyW3RWyNZRg1/giphy.gif"></img>  
+  </a>
+  <br>
+  <i>A very basic ImTui example</i>
+</p>
 
-![hnterm2](https://user-images.githubusercontent.com/1991296/131371951-3af42be8-657e-4542-a46a-0370cfc431d8.gif)
+---
 
-![imtui-tables](https://user-images.githubusercontent.com/1991296/140774086-285cb34f-0851-47b0-82e5-2e8a5bf174ac.gif)
+<p align="center">
+  <a href="https://slack.ggerganov.com">
+    <img alt="Slack client" src="https://user-images.githubusercontent.com/1991296/180660513-e9471200-11b1-4e79-bec0-e2d313dfd6a6.gif"></img>  
+  </a>
+  <br>
+  <i>Text-based client for <a href="https://slack.com">Slack</a></i>
+</p>
 
-[![wtf-tui-demo](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8.svg)](https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8)
+---
 
-![image](https://user-images.githubusercontent.com/1991296/131372067-65393d76-5c59-499a-b8d4-0f9c7ea1365a.png)
+<p align="center">
+  <a href="https://imtui.ggerganov.com">
+    <img alt="Tables" src="https://user-images.githubusercontent.com/1991296/140774086-285cb34f-0851-47b0-82e5-2e8a5bf174ac.gif"></img>  
+  </a>
+  <br>
+  <i>Tables example</i>
+</p>
 
-![image](https://user-images.githubusercontent.com/1991296/131369757-f6411f2b-b629-4d9d-a5b1-e20b6d5c484d.png)
+---
+
+<p align="center">
+  <a href="https://github.com/ggerganov/hnterm">
+    <img alt="HNTerm" src="https://user-images.githubusercontent.com/1991296/131371951-3af42be8-657e-4542-a46a-0370cfc431d8.gif"></img>  
+  </a>
+  <br>
+  <i>Text-based client for <a href="https://news.ycombinator.com/news">Hacker News</a></i>
+</p>
+
+---
+
+<p align="center">
+  <a href="https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8">
+    <img alt="WTF util" src="https://asciinema.org/a/VUKWZM70PxRCHueyPFXy9smU8.svg"></img>  
+  </a>
+  <br>
+  <i>Text-based configuration editor for the <a href="https://wtfutil.com/">WTF Dashboard</a></i>
+</p>
 
 ## Live demo in the browser
 
@@ -25,6 +61,7 @@ Even though this library is supposed to be used in the terminal, for convenience
 - Demo 0: [imtui.ggerganov.com](https://imtui.ggerganov.com/)
 - Demo 1: [hnterm.ggerganov.com](https://hnterm.ggerganov.com/)
 - Demo 2: [wtf-tui.ggerganov.com](https://wtf-tui.ggerganov.com/)
+- Demo 3: [slack.ggerganov.com](https://slack.ggerganov.com/)
 
 Note: the demos work best with **Chrome**
 
@@ -38,6 +75,7 @@ For basic usage of ImTui, check one of the available samples:
 - [example-emscripten0](https://github.com/ggerganov/imtui/blob/master/examples/emscripten0/main.cpp)
 - [hnterm](https://github.com/ggerganov/hnterm) - a simple tool to browse Hacker News in the terminal
 - [wtf-tui](https://github.com/ggerganov/wtf-tui) - text-based UI for configuring the WTF terminal dashboard
+- [slack](https://github.com/ggerganov/imtui/blob/master/examples/slack) - text-based mock UI for Slack
 
 ## Building
 
