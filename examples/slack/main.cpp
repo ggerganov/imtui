@@ -845,7 +845,7 @@ extern "C" {
                 ImGui::PushStyleColor(ImGuiCol_Button,  g_ui.colors.leftPanelBG);
                 ImGui::PushStyleColor(ImGuiCol_ChildBg, g_ui.colors.leftPanelBG);
 
-                ImGui::BeginChild("Child window", ImVec2(g_ui.leftPanelW, 0), true);
+                ImGui::BeginChild("Child window", ImVec2(g_ui.leftPanelW - 1, 0), true);
 
                 {
                     ImGui::PushStyleColor(ImGuiCol_Text,   g_ui.colors.leftPanelTitleFG);
@@ -1005,7 +1005,7 @@ extern "C" {
                 }
 
                 // left panel resizing
-                if (ImGui::IsWindowHovered() && abs(ImGui::GetIO().MousePos.x - g_ui.leftPanelW) < 2) {
+                if (ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow) && abs(ImGui::GetIO().MousePos.x - g_ui.leftPanelW) < 2) {
                     g_ui.isHoveringLeftPanelResize = true;
 
                     if (ImGui::IsMouseDown(0) && !g_ui.isResizingLeftPanel) {
@@ -1554,6 +1554,8 @@ extern "C" {
             ImGui::End();
 
             if (g_ui.showStyleEditor) {
+                ImGui::SetNextWindowPos({ 20, 10 }, ImGuiCond_Once);
+                ImGui::SetNextWindowSize({ 50, 24 }, ImGuiCond_Once);
                 ImGui::Begin("Style editor", &g_ui.showStyleEditor);
 
                 ImGui::Text("%s", "");
