@@ -2,8 +2,8 @@ name: CI
 on: [push]
 
 jobs:
-    ubuntu-18_04-gcc:
-        runs-on: ubuntu-18.04
+    ubuntu-20_04-gcc:
+        runs-on: ubuntu-20.04
 
         strategy:
             matrix:

@@ -424,11 +424,11 @@ bool UI::renderMessages(const std::vector<MessageWithReplies> & messages, int wi
                 const auto l = curDate.size() + 6;
 
                 ImGui::Text("%s", "");
-                renderSeparator("", "-", "", width/2 - l/2, true);
+                renderSeparator("", "-", "", width/2 - l/2 - 1, true);
                 ImGui::SameLine();
                 ImGui::Text("%s", curDate.c_str());
                 ImGui::SameLine();
-                renderSeparator("", "-", "", width/2 - l/2, true);
+                renderSeparator("", "-", "", width/2 - l/2 - 1, true);
                 lastDate = curDate;
             }
         }
