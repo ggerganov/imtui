@@ -1560,54 +1560,60 @@ extern "C" {
 
                 ImGui::Text("%s", "");
 
-                bool changed = false;
+                {
+                    ImGui::BeginChild("##Colors", ImVec2(0, ImGui::GetWindowSize().y - ImGui::GetCursorPosY() - 3), true);
 
-                changed |= ImGui::ColorEdit3("textFG",  (float *) &g_ui.colors.textFG);
-                changed |= ImGui::ColorEdit3("titleFG", (float *) &g_ui.colors.titleFG);
+                    bool changed = false;
 
-                changed |= ImGui::ColorEdit3("itemBG",        (float *) &g_ui.colors.itemBG);
-                changed |= ImGui::ColorEdit3("itemBGHovered", (float *) &g_ui.colors.itemBGHovered);
-                changed |= ImGui::ColorEdit3("itemBGActive",  (float *) &g_ui.colors.itemBGActive);
+                    changed |= ImGui::ColorEdit3("textFG",  (float *) &g_ui.colors.textFG);
+                    changed |= ImGui::ColorEdit3("titleFG", (float *) &g_ui.colors.titleFG);
 
-                changed |= ImGui::ColorEdit3("leftPanelBG",      (float *) &g_ui.colors.leftPanelBG);
-                changed |= ImGui::ColorEdit3("leftPanelTextFG",  (float *) &g_ui.colors.leftPanelTextFG);
-                changed |= ImGui::ColorEdit3("leftPanelTitleFG", (float *) &g_ui.colors.leftPanelTitleFG);
+                    changed |= ImGui::ColorEdit3("itemBG",        (float *) &g_ui.colors.itemBG);
+                    changed |= ImGui::ColorEdit3("itemBGHovered", (float *) &g_ui.colors.itemBGHovered);
+                    changed |= ImGui::ColorEdit3("itemBGActive",  (float *) &g_ui.colors.itemBGActive);
 
-                changed |= ImGui::ColorEdit3("mainWindowBG",      (float *) &g_ui.colors.mainWindowBG);
-                changed |= ImGui::ColorEdit3("mainWindowTextFG",  (float *) &g_ui.colors.mainWindowTextFG);
-                changed |= ImGui::ColorEdit3("mainWindowTitleFG", (float *) &g_ui.colors.mainWindowTitleFG);
+                    changed |= ImGui::ColorEdit3("leftPanelBG",      (float *) &g_ui.colors.leftPanelBG);
+                    changed |= ImGui::ColorEdit3("leftPanelTextFG",  (float *) &g_ui.colors.leftPanelTextFG);
+                    changed |= ImGui::ColorEdit3("leftPanelTitleFG", (float *) &g_ui.colors.leftPanelTitleFG);
 
-                changed |= ImGui::ColorEdit3("popupBG", (float *) &g_ui.colors.popupBG);
+                    changed |= ImGui::ColorEdit3("mainWindowBG",      (float *) &g_ui.colors.mainWindowBG);
+                    changed |= ImGui::ColorEdit3("mainWindowTextFG",  (float *) &g_ui.colors.mainWindowTextFG);
+                    changed |= ImGui::ColorEdit3("mainWindowTitleFG", (float *) &g_ui.colors.mainWindowTitleFG);
 
-                changed |= ImGui::ColorEdit3("listHeaderFG", (float *) &g_ui.colors.listHeaderFG);
+                    changed |= ImGui::ColorEdit3("popupBG", (float *) &g_ui.colors.popupBG);
 
-                changed |= ImGui::ColorEdit3("channelSelectedBG", (float *) &g_ui.colors.channelSelectedBG);
-                changed |= ImGui::ColorEdit3("channelActiveFG",   (float *) &g_ui.colors.channelActiveFG);
-                changed |= ImGui::ColorEdit3("channelMentionsFG", (float *) &g_ui.colors.channelMentionsFG);
-                changed |= ImGui::ColorEdit3("channelMentionsBG", (float *) &g_ui.colors.channelMentionsBG);
+                    changed |= ImGui::ColorEdit3("listHeaderFG", (float *) &g_ui.colors.listHeaderFG);
 
-                changed |= ImGui::ColorEdit3("userActiveFG", (float *) &g_ui.colors.userActiveFG);
+                    changed |= ImGui::ColorEdit3("channelSelectedBG", (float *) &g_ui.colors.channelSelectedBG);
+                    changed |= ImGui::ColorEdit3("channelActiveFG",   (float *) &g_ui.colors.channelActiveFG);
+                    changed |= ImGui::ColorEdit3("channelMentionsFG", (float *) &g_ui.colors.channelMentionsFG);
+                    changed |= ImGui::ColorEdit3("channelMentionsBG", (float *) &g_ui.colors.channelMentionsBG);
 
-                changed |= ImGui::ColorEdit3("messageUser",    (float *) &g_ui.colors.messageUser);
-                changed |= ImGui::ColorEdit3("messageTime",    (float *) &g_ui.colors.messageTime);
-                changed |= ImGui::ColorEdit3("messageHovered", (float *) &g_ui.colors.messageHovered);
-                changed |= ImGui::ColorEdit3("messageReact",   (float *) &g_ui.colors.messageReact);
-                changed |= ImGui::ColorEdit3("messageReplies", (float *) &g_ui.colors.messageReplies);
+                    changed |= ImGui::ColorEdit3("userActiveFG", (float *) &g_ui.colors.userActiveFG);
 
-                changed |= ImGui::ColorEdit3("inputBG",            (float *) &g_ui.colors.inputBG);
-                changed |= ImGui::ColorEdit3("inputSendBG",        (float *) &g_ui.colors.inputSendBG);
-                changed |= ImGui::ColorEdit3("inputSendFG",        (float *) &g_ui.colors.inputSendFG);
-                changed |= ImGui::ColorEdit3("inputSendBGHovered", (float *) &g_ui.colors.inputSendBGHovered);
-                changed |= ImGui::ColorEdit3("inputSendBGActive",  (float *) &g_ui.colors.inputSendBGActive);
-                changed |= ImGui::ColorEdit3("inputTooltip",       (float *) &g_ui.colors.inputTooltip);
+                    changed |= ImGui::ColorEdit3("messageUser",    (float *) &g_ui.colors.messageUser);
+                    changed |= ImGui::ColorEdit3("messageTime",    (float *) &g_ui.colors.messageTime);
+                    changed |= ImGui::ColorEdit3("messageHovered", (float *) &g_ui.colors.messageHovered);
+                    changed |= ImGui::ColorEdit3("messageReact",   (float *) &g_ui.colors.messageReact);
+                    changed |= ImGui::ColorEdit3("messageReplies", (float *) &g_ui.colors.messageReplies);
 
-                changed |= ImGui::ColorEdit3("buttonActiveFG", (float *) &g_ui.colors.buttonActiveFG);
+                    changed |= ImGui::ColorEdit3("inputBG",            (float *) &g_ui.colors.inputBG);
+                    changed |= ImGui::ColorEdit3("inputSendBG",        (float *) &g_ui.colors.inputSendBG);
+                    changed |= ImGui::ColorEdit3("inputSendFG",        (float *) &g_ui.colors.inputSendFG);
+                    changed |= ImGui::ColorEdit3("inputSendBGHovered", (float *) &g_ui.colors.inputSendBGHovered);
+                    changed |= ImGui::ColorEdit3("inputSendBGActive",  (float *) &g_ui.colors.inputSendBGActive);
+                    changed |= ImGui::ColorEdit3("inputTooltip",       (float *) &g_ui.colors.inputTooltip);
 
-                changed |= ImGui::ColorEdit3("indicatorOnline",  (float *) &g_ui.colors.indicatorOnline);
-                changed |= ImGui::ColorEdit3("indicatorOffline", (float *) &g_ui.colors.indicatorOffline);
+                    changed |= ImGui::ColorEdit3("buttonActiveFG", (float *) &g_ui.colors.buttonActiveFG);
 
-                if (changed) {
-                    g_ui.setStyle(UI::EStyle(-1));
+                    changed |= ImGui::ColorEdit3("indicatorOnline",  (float *) &g_ui.colors.indicatorOnline);
+                    changed |= ImGui::ColorEdit3("indicatorOffline", (float *) &g_ui.colors.indicatorOffline);
+
+                    if (changed) {
+                        g_ui.setStyle(UI::EStyle(-1));
+                    }
+
+                    ImGui::EndChild();
                 }
 
                 ImGui::Text("%s", "");
@@ -1754,6 +1760,12 @@ int main() {
             for (auto & ch : cur.text) {
                 if (ch < 32) {
                     text += "@";
+                } else if (ch == '<') {
+                    text += "&lt;";
+                } else if (ch == '>') {
+                    text += "&gt;";
+                } else if (ch == '&') {
+                    text += "&amp;";
                 } else {
                     text += ch;
                 }
