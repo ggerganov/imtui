@@ -20,6 +20,7 @@ endif()
 
 if (IMTUI_SUPPORT_NCURSES)
     add_subdirectory(ncurses0)
+    add_subdirectory(slack)
 
     if (IMTUI_SUPPORT_CURL)
         if (IMTUI_SUPPORT_CURL)
@@ -30,6 +31,5 @@ if (IMTUI_SUPPORT_NCURSES)
         endif()
 
         add_subdirectory(hnterm)
-        add_subdirectory(slack)
     endif()
 endif()

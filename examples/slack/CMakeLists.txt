@@ -1,4 +1,4 @@
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(TARGET slack)
@@ -31,13 +31,11 @@ else()
 
     target_include_directories(${TARGET} PRIVATE
         ..
-        ${CURL_INCLUDE_DIR}
         )
 
     target_link_libraries(${TARGET} PRIVATE
         imtui-ncurses
         imtui-examples-common
-        ${CURL_LIBRARIES}
         )
 endif()
 

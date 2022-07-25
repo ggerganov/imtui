@@ -1412,7 +1412,7 @@ extern "C" {
                     if (int nreplies = channel.messages[g_ui.threadMessage].replies.size(); nreplies > 0) {
                         ImGui::Text("%s", "");
                         {
-                            static char buf[16];
+                            static char buf[32];
                             sprintf(buf, "%d replies ", nreplies);
                             g_ui.renderSeparator(buf, "-", "-", g_ui.threadPanelW - 4, true);
                         }
@@ -1750,7 +1750,7 @@ int main() {
         for (auto & cur : kLogs) {
             std::string text;
             for (auto & ch : cur.text) {
-                if (ch > 127 || ch < 32) {
+                if (ch < 32) {
                     text += "@";
                 } else {
                     text += ch;
@@ -1769,7 +1769,7 @@ int main() {
             const int nMessages = rand()%100 + 10;
 
             for (int i = 0; i < nMessages; ++i) {
-                const bool isSameUser = (logs[i - 1].username == logs[logId].username);
+                const bool isSameUser = (logs[logId - 1].username == logs[logId].username);
 
                 int uid = lastUid == -1 || !isSameUser ? rand()%g_ui.users.size() : lastUid;
                 while (!isSameUser && uid == lastUid) {
@@ -1824,7 +1824,7 @@ int main() {
             const int nMessages = rand()%100 + 10;
 
             for (int i = 0; i < nMessages; ++i) {
-                const bool isSameUser = (logs[i - 1].username == logs[logId].username);
+                const bool isSameUser = (logs[logId - 1].username == logs[logId].username);
 
                 int uid = lastUid == -1 || !isSameUser ? rand()%g_ui.users.size() : lastUid;
                 while (!isSameUser && (uid == lastUid || (uid != 0 && uid != user.id))) {
