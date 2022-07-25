@@ -1761,11 +1761,11 @@ int main() {
                 if (ch < 32) {
                     text += "@";
                 } else if (ch == '<') {
-                    text += "&lt;";
+                    text += "@lt;";
                 } else if (ch == '>') {
-                    text += "&gt;";
+                    text += "@gt;";
                 } else if (ch == '&') {
-                    text += "&amp;";
+                    text += "@amp;";
                 } else {
                     text += ch;
                 }
