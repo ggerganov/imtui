@@ -190,7 +190,7 @@ void updateRequests_impl() {
     curl_multi_perform(g_cm, &still_alive);
 
     while (still_alive < MAX_PARALLEL && g_fetchQueue.size() > 0) {
-        int idx = 0;
+        long unsigned int idx = 0;
         while (g_fetchData[idx].running) {
             ++idx;
             if (idx == g_fetchData.size()) break;
