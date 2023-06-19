@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <variant>
+#include <cstdint>
 
 namespace HN {
 
