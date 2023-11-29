@@ -5,7 +5,7 @@
 #pragma once
 
 // simply expose the existing Dear ImGui API
-#include "imgui.h"
+#include "imgui/imgui.h"
 
 #include <cstring>
 #include <cstdint>
