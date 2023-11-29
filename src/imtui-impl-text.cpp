@@ -6,8 +6,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "imtui/imtui.h"
-#include "imtui/imtui-impl-text.h"
+#include "imtui.h"
+#include "imtui-impl-text.h"
 
 #include <cmath>
 #include <vector>
@@ -287,12 +287,21 @@ bool ImTui_ImplText_Init() {
     ImFontConfig fontConfig;
     fontConfig.GlyphMinAdvanceX = 1.0f;
     fontConfig.SizePixels = 1.00;
+    static const ImWchar ranges[] = {
+        0x0020, 0x052F,
+        0x1D00, 0x1DFF,
+        0x2000, 0x206F,
+        0x20A0, 0x20CF,
+        0x2100, 0x214F,
+        0x2190, 0x22FF,
+        //0x0020, 0xCFFF,
+        0
+    };
+    fontConfig.GlyphRanges = ranges;
     ImGui::GetIO().Fonts->AddFontDefault(&fontConfig);
 
     // Build atlas
-    unsigned char* tex_pixels = NULL;
-    int tex_w, tex_h;
-    ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&tex_pixels, &tex_w, &tex_h);
+    ImGui::GetIO().Fonts->Build();
 
     return true;
 }
