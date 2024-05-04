@@ -10,6 +10,7 @@
 #include "imtui/imtui-impl-text.h"
 
 #include <cmath>
+#include <algorithm>
 #include <vector>
 
 #define ABS(x) ((x >= 0) ? x : -x)
