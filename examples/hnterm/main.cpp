@@ -386,7 +386,7 @@ extern "C" {
 
                     if (windowId == stateUI.hoveredWindowId) {
                         if (ImGui::IsMouseDoubleClicked(0) ||
-                            ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Enter], false)) {
+                            ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
                             if (stateUI.showHelpModal == false && window.hoveredStoryId < (int) storyIds.size()) {
                                 window.showComments = true;
                                 window.selectedStoryId = storyIds[window.hoveredStoryId];
@@ -398,12 +398,12 @@ extern "C" {
                         }
 
                         if (ImGui::IsKeyPressed('k', true) ||
-                            ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_UpArrow], true)) {
+                            ImGui::IsKeyPressed(ImGuiKey_UpArrow, true)) {
                             window.hoveredStoryId = std::max(0, window.hoveredStoryId - 1);
                         }
 
                         if (ImGui::IsKeyPressed('j', true) ||
-                            ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_DownArrow], true)) {
+                            ImGui::IsKeyPressed(ImGuiKey_DownArrow, true)) {
                             window.hoveredStoryId = std::max(0, std::min(nShow - 1, window.hoveredStoryId + 1));
                         }
 
@@ -415,7 +415,7 @@ extern "C" {
                             window.hoveredStoryId = nShow - 1;
                         }
 
-                        if (ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Tab])) {
+                        if (ImGui::IsKeyPressed(ImGuiKey_Tab)) {
                             stateUI.windows[stateUI.hoveredWindowId].content =
                                 (UI::WindowContent) ((int(stateUI.windows[stateUI.hoveredWindowId].content) + 1)%int(UI::WindowContent::Count));
                         }
@@ -503,7 +503,7 @@ extern "C" {
                                     }
 
                                     if (ImGui::IsMouseDoubleClicked(0) ||
-                                        ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Enter], false)) {
+                                        ImGui::IsKeyPressed(ImGuiKey_Enter, false)) {
                                         stateUI.collapsed[id] = !stateUI.collapsed[id];
                                     }
                                 }
@@ -539,12 +539,12 @@ extern "C" {
 
                         if (windowId == stateUI.hoveredWindowId) {
                             if (ImGui::IsKeyPressed('k', true) ||
-                                ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_UpArrow], true)) {
+                                ImGui::IsKeyPressed(ImGuiKey_UpArrow, true)) {
                                 window.hoveredCommentId = std::max(0, window.hoveredCommentId - 1);
                             }
 
                             if (ImGui::IsKeyPressed('j', true) ||
-                                ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_DownArrow], true)) {
+                                ImGui::IsKeyPressed(ImGuiKey_DownArrow, true)) {
                                 window.hoveredCommentId = std::min(curCommentId - 1, window.hoveredCommentId + 1);
                             }
 
@@ -564,7 +564,7 @@ extern "C" {
                                 ImGui::IsMouseClicked(2) ||
                                 ImGui::IsKeyPressed('q', false) ||
                                 ImGui::IsKeyPressed('b', false) ||
-                                ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_Backspace], false)) {
+                                ImGui::IsKeyPressed(ImGuiKey_Backspace, false)) {
                                 window.showComments = false;
                             }
                         }
@@ -576,11 +576,11 @@ extern "C" {
                 ImGui::End();
             }
 
-            if (ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_LeftArrow], true)) {
+            if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow, true)) {
                 stateUI.hoveredWindowId = std::max(0, stateUI.hoveredWindowId - 1);
             }
 
-            if (ImGui::IsKeyPressed(ImGui::GetIO().KeyMap[ImGuiKey_RightArrow], true)) {
+            if (ImGui::IsKeyPressed(ImGuiKey_RightArrow, true)) {
                 stateUI.hoveredWindowId = std::min(stateUI.nWindows - 1, stateUI.hoveredWindowId + 1);
             }
 
